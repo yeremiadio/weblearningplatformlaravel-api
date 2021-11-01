@@ -28,6 +28,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     Route::get('materials', [MaterialController::class, 'index']);
     Route::post('materials', [MaterialController::class, 'store']);
+    Route::put('materials/{id}', [MaterialController::class, 'update']);
 
     Route::post('/logout', [AuthenticationController::class, 'logout']);
 });

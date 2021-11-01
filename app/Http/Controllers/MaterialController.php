@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Material;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\File;
 
 class MaterialController extends Controller
 {
@@ -49,7 +50,7 @@ class MaterialController extends Controller
         }
 
         if ($request->hasFile('image')) {
-            $input['image'] = rand().'.'.request()->image->getClientOriginalExtension();
+            $input['image'] = rand() . '.' . request()->image->getClientOriginalExtension();
 
             request()->image->move(public_path('/images/material/'), $input['image']);
         }
@@ -93,9 +94,38 @@ class MaterialController extends Controller
      * @param  \App\Models\Material  $material
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Material $material)
+    public function update($id, Request $request)
     {
-        //
+        $material = Material::where('id', $id)->first();
+        if (!$material) return $this->responseFailed('Data tidak ditemukan', '', 404);
+
+        $input = $request->all();
+        $validator = Validator::make($input, [
+            'title' => 'required|string',
+            'description' => 'required|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+        ]);
+
+        if ($validator->fails()) {
+            return $this->responseFailed('Error Validation', $validator->errors(), 400);
+        }
+
+        $oldImage = $material->image;
+
+        if ($request->hasFile('image')) {
+            File::delete('/images/material/' . $oldImage);
+            $input['image'] = rand() . '.' . request()->image->getClientOriginalExtension();
+
+            request()->image->move(public_path('/images/material/'), $input['image']);
+        } else {
+            $input['image'] = $oldImage;
+        }
+
+        $material->update($input);
+
+        $data = Material::find($id);
+
+        return $this->responseSuccess('Material has been updated', $data, 200);
     }
 
     /**
