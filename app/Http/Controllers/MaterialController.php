@@ -134,8 +134,17 @@ class MaterialController extends Controller
      * @param  \App\Models\Material  $material
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Material $material)
+    public function destroy($id)
     {
-        //
+        $material = Material::where('id', $id)->first();
+        if (!$material) return $this->responseFailed('Data not found', '', 404);
+
+        if ($material->image) {
+            File::delete('/images/materi/' . $material->image);
+        }
+
+        $material->delete();
+
+        return $this->responseSuccess('Data has been deleted');
     }
 }
