@@ -6,6 +6,7 @@ use App\Models\Material;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\File;
+// use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class MaterialController extends Controller
 {
@@ -50,16 +51,18 @@ class MaterialController extends Controller
         }
 
         if ($request->hasFile('image')) {
-            $input['image'] = rand() . '.' . request()->image->getClientOriginalExtension();
-
-            request()->image->move(public_path('/images/material/'), $input['image']);
+            // $input['image'] = rand() . '.' . request()->image->getClientOriginalExtension();
+            // $uploadedFileUrl = Cloudinary::upload($request->file('image')->getRealPath())->getSecurePath();
+            $uploadedFileUrl = cloudinary()->upload($request->file('image')->getRealPath())->getSecurePath();
+            // dd($uploadedFileUrl);
+            // request()->image->move(public_path('/images/material/'), $input['image']);
         }
 
         $data = Material::create([
             // 'user_id' => auth()->user()->id,
             'title' => $input['title'],
             'description' => $input['description'],
-            'image' => $input['image'] ?? null
+            'image' => $uploadedFileUrl ?? null
         ]);
 
         return $this->responseSuccess('Data created', $data, 201);
@@ -113,10 +116,11 @@ class MaterialController extends Controller
         $oldImage = $material->image;
 
         if ($request->hasFile('image')) {
-            File::delete('/images/material/' . $oldImage);
-            $input['image'] = rand() . '.' . request()->image->getClientOriginalExtension();
+            $input['image'] = cloudinary()->upload($request->file('image')->getRealPath())->getSecurePath();
+            // File::delete('/images/material/' . $oldImage);
+            // $input['image'] = rand() . '.' . request()->image->getClientOriginalExtension();
 
-            request()->image->move(public_path('/images/material/'), $input['image']);
+            // request()->image->move(public_path('/images/material/'), $input['image']);
         } else {
             $input['image'] = $oldImage;
         }
@@ -139,9 +143,9 @@ class MaterialController extends Controller
         $material = Material::where('id', $id)->first();
         if (!$material) return $this->responseFailed('Data not found', '', 404);
 
-        if ($material->image) {
-            File::delete('/images/materi/' . $material->image);
-        }
+        // if ($material->image) {
+        //     File::delete('/images/materi/' . $material->image);
+        // }
 
         $material->delete();
 
