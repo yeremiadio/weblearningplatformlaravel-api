@@ -19,18 +19,12 @@ use App\Http\Controllers\QuizController;
 */
 
 Route::middleware(['api' => 'return-json'])->group(function () {
-
-
     //register new user
     Route::post('/register', [AuthenticationController::class, 'register']);
     //login user
     Route::post('/login', [AuthenticationController::class, 'login']);
 
     Route::group(['middleware' => ['auth:sanctum']], function () {
-
-        // Route::get('/profile', function (Request $request) {
-        //     return auth()->user();
-        // });
 
         Route::get('materials', [MaterialController::class, 'index']);
 
