@@ -32,7 +32,7 @@ class QuizController extends Controller
             }])->get();
         }
 
-        return $this->responseSuccess('Data', $data);
+        return $this->responseSuccess('Quiz Data', $data);
     }
 
     public function store(Request $request)

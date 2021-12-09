@@ -4,7 +4,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthenticationController;
 use App\Http\Controllers\MaterialController;
+use App\Http\Controllers\PageController;
 use App\Http\Controllers\QuizController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\RoleController;
+
 // use App\Http\Controllers\ResultController;
 
 /*
@@ -23,37 +27,52 @@ Route::middleware(['api' => 'return-json'])->group(function () {
     Route::post('/register', [AuthenticationController::class, 'register']);
     //login user
     Route::post('/login', [AuthenticationController::class, 'login']);
+    Route::get('pages', [PageController::class, 'index']);
+    Route::get('pages/{id}/content', [PageController::class, 'show']);
+    Route::post('pages/{id}/content', [PageController::class, 'store']);
 
     Route::group(['middleware' => ['auth:sanctum']], function () {
 
         Route::get('materials', [MaterialController::class, 'index']);
+        Route::get('quizzes', [QuizController::class, 'index']);
+        Route::get('roles', [RoleController::class, 'index']);
+        Route::get('quizzes/{quizzes:slug}', [QuizController::class, 'show']);
+        Route::get('users', [UserController::class, 'index']);
+        Route::get('users/{id}', [UserController::class, 'show']);
 
         Route::group(['prefix' => 'admin', 'middleware' => ['admin']], function () {
-            Route::post('quizzes', [QuizController::class, 'store']);
-            Route::put('quizzes/{quizzes:slug}', [QuizController::class, 'update']);
-            Route::delete('quizzes/{quizzes:slug}', [QuizController::class, 'destroy']);
-
-            Route::post('materials', [MaterialController::class, 'store']);
-            Route::put('materials/{id}', [MaterialController::class, 'update']);
-            Route::delete('materials/{id}', [MaterialController::class, 'destroy']);
+            Route::group(['prefix' => 'quizzes'], function () {
+                Route::post('/create', [QuizController::class, 'store']);
+                Route::put('/{quizzes:slug}/update', [QuizController::class, 'update']);
+                Route::delete('/{quizzes:slug}/delete', [QuizController::class, 'destroy']);
+            });
+            Route::group(['prefix' => 'users'], function () {
+                Route::post('/create', [UserController::class, 'store']);
+                Route::put('/{id}/update', [UserController::class, 'update']);
+                Route::delete('/{id}/delete', [UserController::class, 'destroy']);
+            });
+            Route::group(['prefix' => 'materials'], function () {
+                Route::post('/create', [MaterialController::class, 'store']);
+                Route::put('/{id}/update', [MaterialController::class, 'update']);
+                Route::delete('/{id}/delete', [MaterialController::class, 'destroy']);
+            });
+            Route::group(['prefix' => 'roles'], function () {
+                Route::post('/create', [RoleController::class, 'store']);
+                Route::put('/{id}/update', [RoleController::class, 'update']);
+                Route::delete('/{id}/delete', [RoleController::class, 'destroy']);
+            });
         });
-
         Route::group(['prefix' => 'teacher', 'middleware' => ['teacher']], function () {
-            // Route::post('result/{slug}/quiz', [ResultController::class, 'quizStore']);
-            Route::post('quizzes', [QuizController::class, 'store']);
-            Route::put('quizzes/{quizzes:slug}', [QuizController::class, 'update']);
-            Route::delete('quizzes/{quizzes:slug}', [QuizController::class, 'destroy']);
-            // Route::delete('quizzes/questions/{id}/file', [QuizController::class, 'deleteQuestionFile']);
-            // Route::delete('quizzes/options/{id}', [QuizController::class, 'deleteOption']);
-
-            // Route::get('result/{slug}/notsubmitted', [ResultController::class, 'resultNotSubmitted']);
-            // Route::get('result/{slug}/quiz', [ResultController::class, 'quizResultSubmitted']);
-            // Route::get('result/{slug}/essay', [ResultController::class, 'essayResultSubmitted']);
-            // Route::put('result/{id}', [ResultController::class, 'createScoreEssay']);
-
-            Route::post('materials', [MaterialController::class, 'store']);
-            Route::put('materials/{id}', [MaterialController::class, 'update']);
-            Route::delete('materials/{id}', [MaterialController::class, 'destroy']);
+            Route::group(['prefix' => 'quizzes'], function () {
+                Route::post('/create', [QuizController::class, 'store']);
+                Route::put('/{quizzes:slug}/update', [QuizController::class, 'update']);
+                Route::delete('/{quizzes:slug}/delete', [QuizController::class, 'destroy']);
+            });
+            Route::group(['prefix' => 'materials'], function () {
+                Route::post('/create', [MaterialController::class, 'store']);
+                Route::put('/{id}/update', [MaterialController::class, 'update']);
+                Route::delete('/{id}/delete', [MaterialController::class, 'destroy']);
+            });
         });
         Route::get('quizzes', [QuizController::class, 'index']);
 

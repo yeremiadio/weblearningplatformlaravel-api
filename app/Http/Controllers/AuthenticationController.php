@@ -18,16 +18,23 @@ class AuthenticationController extends Controller
             'name' => 'required|string',
             'email' => 'required|string|unique:users,email',
             'password' => 'required|string|confirmed',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         if ($validator->fails()) {
             return $this->responseFailed('Error Validation', $validator->errors(), 400);
         }
 
+        if ($request->hasFile('avatar')) {
+            $uploadedFileUrl = cloudinary()->upload($request->file('avatar')->getRealPath())->getSecurePath();
+        }
+
         $user = User::create([
             'name' => $input['name'],
             'email' => $input['email'],
+            'avatar' => $uploadedFileUrl ?? null,
             'password' => bcrypt($input['password']),
+            'role_id' => 3
         ]);
         $token = $user->createToken('token')->plainTextToken;
 
@@ -35,6 +42,8 @@ class AuthenticationController extends Controller
             'user' => $user,
             'token' => $token
         ];
+
+        auth()->logoutOtherDevices($request->password);
 
         return $this->responseSuccess('Registration Successful', $data, 201);
 
@@ -54,7 +63,7 @@ class AuthenticationController extends Controller
             return $this->responseFailed('Email or Password is incorrect', '', 401);
         }
 
-        $user = User::where('email', $input['email'])->first();
+        $user = User::where('email', $input['email'])->with('role')->first();
         $token = $user->createToken('token')->plainTextToken;
 
         $data = [
