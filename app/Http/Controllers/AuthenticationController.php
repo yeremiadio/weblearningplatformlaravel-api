@@ -18,7 +18,6 @@ class AuthenticationController extends Controller
             'name' => 'required|string',
             'email' => 'required|string|unique:users,email',
             'password' => 'required|string|confirmed',
-            'avatar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         if ($validator->fails()) {
@@ -32,7 +31,6 @@ class AuthenticationController extends Controller
         $user = User::create([
             'name' => $input['name'],
             'email' => $input['email'],
-            'avatar' => $uploadedFileUrl ?? null,
             'password' => bcrypt($input['password']),
             'role_id' => 3
         ]);
@@ -74,6 +72,44 @@ class AuthenticationController extends Controller
         $user->update(['last_seen' => Carbon::now()]);
 
         return $this->responseSuccess('Login Successful', $data, 200);
+    }
+
+    public function update($id, Request $request)
+    {
+        $user = User::where('id', $id)->first();
+        if (!$user) return $this->responseFailed('Data not found', '', 404);
+
+        $input = $request->all();
+        $validator = Validator::make($input, [
+            'name' => 'required|string',
+            'email' => 'required|string|email',
+            'role_id' => 'required|numeric',
+            'avatar' => 'nullable',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->responseFailed('Error validation', $validator->errors(), 400);
+        }
+
+        $oldAvatar = $user->avatar;
+        if ($request->hasFile('avatar')) {
+            $input['avatar'] = cloudinary()->upload($request->file('avatar')->getRealPath())->getSecurePath();
+        } else {
+            $input['avatar'] = $oldAvatar;
+        }
+
+        $user->update([
+            'name' => $input['name'],
+            'email' => $input['email'],
+            'avatar' => $input['avatar'],
+            'role_id' => $input['role_id'],
+        ]);
+
+        $data = User::where('id', $id)->with(['role' => function ($q) {
+            $q->select('id', 'role_name');
+        }])->first();
+
+        return $this->responseSuccess('Profile updated successfully', $data, 200);
     }
 
     // this method signs out users by removing tokens

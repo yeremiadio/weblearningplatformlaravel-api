@@ -27,9 +27,12 @@ Route::middleware(['api' => 'return-json'])->group(function () {
     Route::post('/register', [AuthenticationController::class, 'register']);
     //login user
     Route::post('/login', [AuthenticationController::class, 'login']);
-    Route::get('pages', [PageController::class, 'index']);
-    Route::get('pages/{id}/content', [PageController::class, 'show']);
-    Route::post('pages/{id}/content', [PageController::class, 'store']);
+    Route::group(['prefix' => 'pages'], function () {
+        Route::get('/', [PageController::class, 'index']);
+        Route::get('/{slug}/content', [PageController::class, 'loadContent']);
+        Route::post('/{id}/content', [PageController::class, 'changeContent']);
+        // Route::delete('/{quizzes:slug}/delete', [PageController::class, 'destroy']);
+    });
 
     Route::group(['middleware' => ['auth:sanctum']], function () {
 
@@ -39,8 +42,10 @@ Route::middleware(['api' => 'return-json'])->group(function () {
         Route::get('quizzes/{quizzes:slug}', [QuizController::class, 'show']);
         Route::get('users', [UserController::class, 'index']);
         Route::get('users/{id}', [UserController::class, 'show']);
+        Route::put('profile/{id}/update', [AuthenticationController::class, 'update']);
 
         Route::group(['prefix' => 'admin', 'middleware' => ['admin']], function () {
+            Route::post('/pages/create', [PageController::class, 'store']);
             Route::group(['prefix' => 'quizzes'], function () {
                 Route::post('/create', [QuizController::class, 'store']);
                 Route::put('/{quizzes:slug}/update', [QuizController::class, 'update']);
@@ -48,7 +53,7 @@ Route::middleware(['api' => 'return-json'])->group(function () {
             });
             Route::group(['prefix' => 'users'], function () {
                 Route::post('/create', [UserController::class, 'store']);
-                Route::put('/{id}/update', [UserController::class, 'update']);
+                Route::put('users/{id}/update', [UserController::class, 'update']);
                 Route::delete('/{id}/delete', [UserController::class, 'destroy']);
             });
             Route::group(['prefix' => 'materials'], function () {

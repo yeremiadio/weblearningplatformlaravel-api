@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Page;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class PageController extends Controller
 {
@@ -40,16 +41,21 @@ class PageController extends Controller
         $input = $request->all();
         $validator = Validator::make($input, [
             'name' => 'required|string',
-            'slug' => 'required|string',
             'content' => 'nullable'
         ]);
         if ($validator->fails()) return $this->responseFailed('Validation Error', $validator->errors(), 400);
         $data = Page::create([
             'name' => $input['name'],
-            'slug' => $input['slug'],
-            'content' => $input['content'],
+            'slug' => Str::slug($input['name']),
+            'content' => $input['content'] ?? null,
         ]);
         return $this->responseSuccess('Page created successfully', $data, 201);
+    }
+
+    public function changeContent($id)
+    {
+        $data = Page::updateOrCreate(['id' => $id]);
+        return response()->json($data);
     }
 
     /**
@@ -58,11 +64,10 @@ class PageController extends Controller
      * @param  \App\Models\Page  $page
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function loadContent($slug)
     {
-        $data = Page::find($id);
-
-        return $this->responseSuccess('Detail Page', $data, 200);
+        $data = Page::where('slug', $slug)->first();
+        return response()->json($data);
     }
 
     /**
