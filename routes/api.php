@@ -30,8 +30,7 @@ Route::middleware(['api' => 'return-json'])->group(function () {
     Route::group(['prefix' => 'pages'], function () {
         Route::get('/', [PageController::class, 'index']);
         Route::get('/{slug}/content', [PageController::class, 'loadContent']);
-        Route::post('/{id}/content', [PageController::class, 'changeContent']);
-        // Route::delete('/{quizzes:slug}/delete', [PageController::class, 'destroy']);
+        Route::post('/{slug}/content', [PageController::class, 'changeContent']);
     });
 
     Route::group(['middleware' => ['auth:sanctum']], function () {

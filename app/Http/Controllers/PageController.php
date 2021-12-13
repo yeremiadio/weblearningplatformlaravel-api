@@ -41,20 +41,30 @@ class PageController extends Controller
         $input = $request->all();
         $validator = Validator::make($input, [
             'name' => 'required|string',
-            'content' => 'nullable'
         ]);
         if ($validator->fails()) return $this->responseFailed('Validation Error', $validator->errors(), 400);
         $data = Page::create([
             'name' => $input['name'],
             'slug' => Str::slug($input['name']),
-            'content' => $input['content'] ?? null,
+            'content' => json_encode('')
         ]);
         return $this->responseSuccess('Page created successfully', $data, 201);
     }
 
-    public function changeContent($id)
+    // public function changeContent($slug, Request $request)
+    // {
+    //     $data = Page::where('slug', $slug)->update(['content' => $request->input('content')]);
+    //     // $data = Page::updateOrCreate(['name' => $page->name, 'slug' => $slug, 'content' => $request->input('content')]);
+    //     return response()->json($data->content);
+    // }
+    public function changeContent($slug, Request $request)
     {
-        $data = Page::updateOrCreate(['id' => $id]);
+        $page = Page::where('slug', $slug)->first();
+        $page->update(['content' => $request->all()]);
+        $data = Page::where('slug', $page->slug)->first();
+        // $page->update($input);
+        // // $page->updateOrCreate(['name' => $page->name, 'slug' -> $page->slug, 'content' => $request->input('content')]);
+        // $data = Page::where('slug', $page->slug)->first();
         return response()->json($data);
     }
 
@@ -66,8 +76,8 @@ class PageController extends Controller
      */
     public function loadContent($slug)
     {
-        $data = Page::where('slug', $slug)->first();
-        return response()->json($data);
+        $page = Page::where('slug', $slug)->first();
+        return response()->json($page->content);
     }
 
     /**
