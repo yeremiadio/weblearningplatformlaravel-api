@@ -41,11 +41,24 @@ class PageController extends Controller
         $input = $request->all();
         $validator = Validator::make($input, [
             'name' => 'required|string',
+            'description' => 'required|string|max:255',
+            'thumbnail' => 'nullable|image|mimes:png,jpg,jpeg'
         ]);
         if ($validator->fails()) return $this->responseFailed('Validation Error', $validator->errors(), 400);
+
+        if ($request->hasFile('thumbnail')) {
+            // $input['image'] = rand() . '.' . request()->image->getClientOriginalExtension();
+            // $uploadedFileUrl = Cloudinary::upload($request->file('image')->getRealPath())->getSecurePath();
+            $uploadedFileUrl = cloudinary()->upload($request->file('thumbnail')->getRealPath())->getSecurePath();
+            // dd($uploadedFileUrl);
+            // request()->image->move(public_path('/images/material/'), $input['image']);
+        }
+
         $data = Page::create([
             'name' => $input['name'],
             'slug' => Str::slug($input['name']),
+            'thumbnail' => $uploadedFileUrl ?? null,
+            'description' => $input['description'],
             'content' => json_encode('')
         ]);
         return $this->responseSuccess('Page created successfully', $data, 201);
@@ -74,10 +87,16 @@ class PageController extends Controller
      * @param  \App\Models\Page  $page
      * @return \Illuminate\Http\Response
      */
+    public function show($slug)
+    {
+        $data = Page::where('slug', $slug)->first();
+        return $this->responseSuccess('Success', $data, 200);
+    }
+
     public function loadContent($slug)
     {
         $page = Page::where('slug', $slug)->first();
-        return response()->json($page->content);
+        return response($page->content, 200)->header('Content-Type', 'application/json');
     }
 
     /**
@@ -109,8 +128,17 @@ class PageController extends Controller
      * @param  \App\Models\Page  $page
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Page $page)
+    public function destroy($slug)
     {
-        //
+        $page = Page::where('slug', $slug)->first();
+        if (!$page) return $this->responseFailed('Data not found', '', 404);
+
+        // if ($material->image) {
+        //     File::delete('/images/materi/' . $material->image);
+        // }
+
+        $page->delete();
+
+        return $this->responseSuccess('Data has been deleted');
     }
 }

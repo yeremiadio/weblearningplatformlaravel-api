@@ -18,6 +18,8 @@ class CreatePagesTable extends Migration
             $table->string('name');
             $table->string('slug');
             $table->json('content');
+            $table->string('thumbnail')->nullable();
+            $table->longText('description');
             $table->timestamps();
         });
     }

@@ -29,6 +29,7 @@ Route::middleware(['api' => 'return-json'])->group(function () {
     Route::post('/login', [AuthenticationController::class, 'login']);
     Route::group(['prefix' => 'pages'], function () {
         Route::get('/', [PageController::class, 'index']);
+        Route::get('/{slug}', [PageController::class, 'show']);
         Route::get('/{slug}/content', [PageController::class, 'loadContent']);
         Route::post('/{slug}/content', [PageController::class, 'changeContent']);
     });
@@ -44,7 +45,11 @@ Route::middleware(['api' => 'return-json'])->group(function () {
         Route::put('profile/{id}/update', [AuthenticationController::class, 'update']);
 
         Route::group(['prefix' => 'admin', 'middleware' => ['admin']], function () {
-            Route::post('/pages/create', [PageController::class, 'store']);
+            Route::group(['prefix' => 'pages'], function () {
+                Route::post('/create', [PageController::class, 'store']);
+                Route::delete('/{slug}/delete', [PageController::class, 'destroy']);
+            });
+
             Route::group(['prefix' => 'quizzes'], function () {
                 Route::post('/create', [QuizController::class, 'store']);
                 Route::put('/{quizzes:slug}/update', [QuizController::class, 'update']);
