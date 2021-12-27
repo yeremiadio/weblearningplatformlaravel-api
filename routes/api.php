@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthenticationController;
+use App\Http\Controllers\CodeController;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\QuizController;
@@ -34,6 +35,15 @@ Route::middleware(['api' => 'return-json'])->group(function () {
         Route::post('/{slug}/content', [PageController::class, 'changeContent']);
     });
 
+    Route::post('code', function (Request $request) {
+        $input = $request->all();
+        $response = Http::withHeaders([
+            'Authorization' => env('GLOT_AUTH_TOKEN'),
+            'Content-Type' => 'application/json'
+        ])->post(env('GLOT_JS_URL'), $input);
+
+        return response()->json($response->json(), 200);
+    });
     Route::group(['middleware' => ['auth:sanctum']], function () {
 
         Route::get('materials', [MaterialController::class, 'index']);

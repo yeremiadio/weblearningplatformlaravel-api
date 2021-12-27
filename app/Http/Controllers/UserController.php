@@ -153,8 +153,12 @@ class UserController extends Controller
     {
         $user = User::where('id', $id)->first();
         if (!$user) return $this->responseFailed('User not found', '', 404);
+        if (is_array($id)) {
+            User::destroy($id);
+        } else {
+            $user->delete();
+        }
 
-        $user->delete();
 
         return $this->responseSuccess('User deleted successfully');
     }
