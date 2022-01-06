@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthenticationController;
 use App\Http\Controllers\CodeController;
+use App\Http\Controllers\EmailVerificationController;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\QuizController;
@@ -23,29 +24,39 @@ use App\Http\Controllers\RoleController;
 |
 */
 
-Route::middleware(['api' => 'return-json'])->group(function () {
-    //register new user
-    Route::post('/register', [AuthenticationController::class, 'register']);
-    //login user
-    Route::post('/login', [AuthenticationController::class, 'login']);
-    Route::group(['prefix' => 'pages'], function () {
-        Route::get('/', [PageController::class, 'index']);
-        Route::get('/{slug}', [PageController::class, 'show']);
-        Route::get('/{slug}/content', [PageController::class, 'loadContent']);
-        Route::post('/{slug}/content', [PageController::class, 'changeContent']);
-    });
+//register new user
+Route::post('/register', [AuthenticationController::class, 'register']);
+//login user
+Route::post('/login', [AuthenticationController::class, 'login']);
+Route::group(['prefix' => 'pages'], function () {
+    Route::get('/', [PageController::class, 'index']);
+    Route::get('/{slug}', [PageController::class, 'show']);
+    Route::get('/{slug}/content', [PageController::class, 'loadContent']);
+    Route::post('/{slug}/content', [PageController::class, 'changeContent']);
+});
 
-    Route::post('code', function (Request $request) {
-        $input = $request->all();
-        $response = Http::withHeaders([
-            'Authorization' => env('GLOT_AUTH_TOKEN'),
-            'Content-Type' => 'application/json'
-        ])->post(env('GLOT_JS_URL'), $input);
+//Email Verification
 
-        return response()->json($response->json(), 200);
-    });
-    Route::group(['middleware' => ['auth:sanctum']], function () {
 
+Route::post('code', function (Request $request) {
+    $input = $request->all();
+    $response = Http::withHeaders([
+        'Authorization' => env('GLOT_AUTH_TOKEN'),
+        'Content-Type' => 'application/json'
+    ])->post(env('GLOT_JS_URL'), $input);
+
+    return response()->json($response->json(), 200);
+});
+
+Route::get('verify-email/{id}/{hash}', [EmailVerificationController::class, 'verify'])->name('verification.verify');
+
+
+Route::group(['middleware' => ['auth:sanctum']], function () {
+
+    //Email Verification
+    Route::post('verify-email', [EmailVerificationController::class, 'sendVerificationEmail']);
+
+    Route::group(['middleware' => ['verified']], function () {
         Route::get('materials', [MaterialController::class, 'index']);
         Route::get('quizzes', [QuizController::class, 'index']);
         Route::get('roles', [RoleController::class, 'index']);
@@ -96,7 +107,11 @@ Route::middleware(['api' => 'return-json'])->group(function () {
         Route::get('quizzes', [QuizController::class, 'index']);
 
         // Route::get('materials', [MaterialController::class, 'index']);
-
-        Route::post('/logout', [AuthenticationController::class, 'logout']);
     });
+
+    Route::post('/logout', [AuthenticationController::class, 'logout']);
 });
+
+// Route::middleware(['api' => 'return-json'])->group(function () {
+
+// });
