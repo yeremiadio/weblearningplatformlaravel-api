@@ -2,9 +2,8 @@
 
 namespace Database\Seeders;
 
-use Carbon\Carbon;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Models\Role;
 
 class RolesTableSeeder extends Seeder
 {
@@ -15,20 +14,17 @@ class RolesTableSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('roles')->insert([
-            'role_name' => 'admin',
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now()
+        Role::create([
+            'name' => 'admin'
         ]);
-        DB::table('roles')->insert([
-            'role_name' => 'teacher',
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now()
+        Role::create([
+            'name' => 'teacher'
         ]);
-        DB::table('roles')->insert([
-            'role_name' => 'student',
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now()
+        Role::create([
+            'name' => 'student'
+        ]);
+        Role::create([
+            'name' => 'user'
         ]);
     }
 }

@@ -4,23 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Auth\Events\Verified;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
 
 class EmailVerificationController extends Controller
 {
     public function sendVerificationEmail(Request $request)
     {
         if ($request->user()->hasVerifiedEmail()) {
-            return [
-                'message' => 'Already Verified'
-            ];
+            return response()->json('Email already verified', 400);
         }
 
         $request->user()->sendEmailVerificationNotification();
 
-        return ['status' => 'verification-link-sent'];
+        return response()->json('Email verification has been sent', 200);
     }
 
     public function verify($id)
@@ -29,9 +25,11 @@ class EmailVerificationController extends Controller
         if (!$user->hasVerifiedEmail()) {
             $user->markEmailAsVerified();
             event(new Verified($user));
-            return response()->json('Email has been verified', 200);
+            response()->json('Email has been verified', 200);
+            return redirect('/');
         }
-        return response()->json('Email has been verified', 200);
+        response()->json('Email has been verified', 200);
+        return redirect('/');
     }
 
     // public function verify(EmailVerificationRequest $request)
