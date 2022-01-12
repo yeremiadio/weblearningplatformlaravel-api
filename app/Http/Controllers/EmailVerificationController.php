@@ -26,23 +26,12 @@ class EmailVerificationController extends Controller
             $user->markEmailAsVerified();
             event(new Verified($user));
             response()->json('Email has been verified', 200);
-            return redirect('/');
+            if (Auth::check()) {
+                return redirect('http://localhost:3000/dashboard');
+            }
+            return redirect('http://localhost:3000/login');
         }
         response()->json('Email has been verified', 200);
-        return redirect('/');
+        return redirect('http://localhost:3000');
     }
-
-    // public function verify(EmailVerificationRequest $request)
-    // {
-    //     // $request->fulfill();
-
-    //     if (
-    //         $request->route('id') == $request->user()->getKey() &&
-    //         $request->user()->markEmailAsVerified()
-    //     ) {
-    //         event(new Verified($request->user()));
-    //     }
-
-    //     return redirect($this->redirectPath())->with('verified', true);
-    // }
 }
