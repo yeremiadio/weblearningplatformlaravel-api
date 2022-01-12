@@ -11,6 +11,16 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthenticationController extends Controller
 {
+
+    public function checkAuth()
+    {
+        if (Auth::check()) {
+            return $this->responseSuccess('Authenticated', '', 200);
+        }
+
+        return $this->responseFailed('Unauthenticated', '', 401);
+    }
+
     public function register(Request $request)
     {
         $input = $request->all();
@@ -33,12 +43,15 @@ class AuthenticationController extends Controller
             'name' => $input['name'],
             'email' => $input['email'],
             'password' => bcrypt($input['password']),
-            'avatar' => $uploadedFileUrl
+            'avatar' => empty($request->file('avatar')) ? null : $uploadedFileUrl
         ]);
-        $user->assignRole(empty($input['role']) ? 'user' : $input['role']);
+
+        if (!empty($input['role'])) {
+            $user->assignRole($input['role']);
+        }
         $token = $user->createToken('token')->plainTextToken;
         $data = [
-            'user' => $user,
+            'user' => User::where('id', $user->id)->with('roles')->first(),
             'token' => $token
         ];
 
