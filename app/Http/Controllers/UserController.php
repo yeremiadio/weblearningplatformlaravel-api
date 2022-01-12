@@ -15,10 +15,8 @@ class UserController extends Controller
      */
     public function index()
     {
-        $data = User::with(['role' => function ($q) {
-            $q->select('id', 'role_name');
-        }])->get();
-        return $this->responseSuccess('List all users', $data);
+        $data = User::with(['roles'])->get();
+        return $this->responseSuccess('List all users', $data, 200);
     }
 
     /**
@@ -55,19 +53,24 @@ class UserController extends Controller
             $uploadedFileUrl = cloudinary()->upload($request->file('avatar')->getRealPath())->getSecurePath();
         }
 
-        $user = User::create([
-            'name' => $input['name'],
-            'email' => $input['email'],
-            'avatar' => $uploadedFileUrl ?? null,
-            'password' => bcrypt($input['password']),
-            'role_id' => 2,
-        ]);
+        try {
+            $user = User::create([
+                'name' => $input['name'],
+                'email' => $input['email'],
+                'avatar' => $uploadedFileUrl ?? null,
+                'password' => bcrypt($input['password']),
+            ]);
 
-        $data = User::where('id', $user->id)->with(['role' => function ($q) {
-            $q->select('id', 'role_name');
-        }])->first();
+            if (!empty($input['role'])) {
+                $user->assignRole($input['role']);
+            }
 
-        return $this->responseSuccess('User created Successfully', $data, 201);
+            $data = User::where('id', $user->id)->with('roles')->first();
+
+            return $this->responseSuccess('User created Successfully', $data, 201);
+        } catch (\Exception $e) {
+            return $this->responseFailed('Failed', 500);
+        }
     }
 
     /**
@@ -114,7 +117,6 @@ class UserController extends Controller
         $validator = Validator::make($input, [
             'name' => 'required|string',
             'email' => 'required|string|email',
-            'role_id' => 'required|numeric',
             'avatar' => 'nullable',
         ]);
 
@@ -129,18 +131,20 @@ class UserController extends Controller
             $input['avatar'] = $oldAvatar;
         }
 
-        $user->update([
-            'name' => $input['name'],
-            'email' => $input['email'],
-            'avatar' => $input['avatar'],
-            'role_id' => $input['role_id'],
-        ]);
+        $user->syncRoles([]);
 
-        $data = User::where('id', $id)->with(['role' => function ($q) {
-            $q->select('id', 'role_name');
-        }])->first();
+        if (!empty($input['role'])) {
+            $user->assignRole($input['role']);
+        }
 
-        return $this->responseSuccess('User updated successfully', $data, 200);
+        try {
+            $user->update();
+
+            $data = User::where('id', $id)->with('roles')->first();
+            return $this->responseSuccess('User updated successfully', $data, 200);
+        } catch (\Exception $e) {
+            return $this->responseFailed('Failed', 500);
+        }
     }
 
     /**

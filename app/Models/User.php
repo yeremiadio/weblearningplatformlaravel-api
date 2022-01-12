@@ -43,4 +43,9 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function code_histories()
+    {
+        return $this->hasMany(CodeHistories::class);
+    }
 }
