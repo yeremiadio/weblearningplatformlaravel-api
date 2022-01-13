@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class EmailVerificationController extends Controller
 {
@@ -32,6 +33,6 @@ class EmailVerificationController extends Controller
             return redirect('http://localhost:3000/login');
         }
         response()->json('Email has been verified', 200);
-        return redirect('http://localhost:3000');
+        return redirect('http://localhost:3000/login');
     }
 }
