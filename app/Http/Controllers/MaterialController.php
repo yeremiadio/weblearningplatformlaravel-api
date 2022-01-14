@@ -42,6 +42,7 @@ class MaterialController extends Controller
         $input = $request->all();
         $validator = Validator::make($input, [
             'title' => 'required|string',
+            'description' => 'required|string|max:200',
             'content' => 'required|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
         ]);
@@ -61,7 +62,8 @@ class MaterialController extends Controller
         $data = Material::create([
             // 'user_id' => auth()->user()->id,
             'title' => $input['title'],
-            'content' => $input['description'],
+            'description' => $input['description'],
+            'content' => $input['content'],
             'image' => $uploadedFileUrl ?? null
         ]);
 
@@ -105,6 +107,7 @@ class MaterialController extends Controller
         $input = $request->all();
         $validator = Validator::make($input, [
             'title' => 'required|string',
+            'description' => 'required|string',
             'content' => 'required|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
         ]);

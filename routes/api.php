@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthenticationController;
 use App\Http\Controllers\CodeController;
 use App\Http\Controllers\CodeHistoryController;
 use App\Http\Controllers\EmailVerificationController;
+use App\Http\Controllers\ImageUploadController;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\QuizController;
@@ -37,7 +38,7 @@ Route::middleware(['api' => 'return-json'])->group(function () {
         Route::post('/{slug}/content', [PageController::class, 'changeContent']);
     });
 
-    //Email Verification
+    Route::post('upload', [ImageUploadController::class, 'upload']);
 
 
     Route::post('code', function (Request $request) {
