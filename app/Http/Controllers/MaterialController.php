@@ -18,7 +18,7 @@ class MaterialController extends Controller
     public function index()
     {
         $data = Material::all();
-        return $this->responseSuccess('Materials Data', $data);
+        return $this->responseSuccess('Materials Data', $data, 200);
     }
 
     /**
@@ -44,7 +44,7 @@ class MaterialController extends Controller
             'title' => 'required|string',
             'description' => 'required|string|max:200',
             'content' => 'required|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
         if ($validator->fails()) {
@@ -64,7 +64,7 @@ class MaterialController extends Controller
             'title' => $input['title'],
             'description' => $input['description'],
             'content' => $input['content'],
-            'image' => $uploadedFileUrl ?? null
+            'thumbnail' => $uploadedFileUrl ?? null
         ]);
 
         return $this->responseSuccess('Data created', $data, 201);
@@ -109,23 +109,23 @@ class MaterialController extends Controller
             'title' => 'required|string',
             'description' => 'required|string',
             'content' => 'required|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
         if ($validator->fails()) {
             return $this->responseFailed('Error Validation', $validator->errors(), 400);
         }
 
-        $oldImage = $material->image;
+        $oldThubmanil = $material->thumbnail;
 
-        if ($request->hasFile('image')) {
-            $input['image'] = cloudinary()->upload($request->file('image')->getRealPath())->getSecurePath();
+        if ($request->hasFile('thumbnail')) {
+            $input['thumbnail'] = cloudinary()->upload($request->file('thumbnail')->getRealPath())->getSecurePath();
             // File::delete('/images/material/' . $oldImage);
             // $input['image'] = rand() . '.' . request()->image->getClientOriginalExtension();
 
             // request()->image->move(public_path('/images/material/'), $input['image']);
         } else {
-            $input['image'] = $oldImage;
+            $input['thumbnail'] = $oldThubmanil;
         }
 
         $material->update($input);

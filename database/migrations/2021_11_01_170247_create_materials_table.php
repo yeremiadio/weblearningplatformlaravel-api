@@ -18,7 +18,7 @@ class CreateMaterialsTable extends Migration
             $table->string('title');
             $table->longText('description');
             $table->longText('content');
-            $table->string('image')->nullable();
+            $table->string('thumbnail')->nullable();
             $table->timestamps();
         });
     }
