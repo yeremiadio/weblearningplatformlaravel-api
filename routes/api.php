@@ -100,7 +100,7 @@ Route::middleware(['api' => 'return-json'])->group(function () {
                     Route::delete('/{id}/delete', [RoleController::class, 'destroy']);
                 });
             });
-            Route::group(['middleware' => ['role:teacher']], function () {
+            Route::group(['middleware' => ['role:admin', 'role:teacher']], function () {
                 Route::group(['prefix' => 'quizzes'], function () {
                     Route::post('/create', [QuizController::class, 'store']);
                     Route::put('/{quizzes:slug}/update', [QuizController::class, 'update']);
