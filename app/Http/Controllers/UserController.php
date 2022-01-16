@@ -138,7 +138,11 @@ class UserController extends Controller
         }
 
         try {
-            $user->update();
+            $user->update([
+                'name' => $input['name'],
+                'avatar' => $input['avatar'] ?? null,
+                'email' => $input['email']
+            ]);
 
             $data = User::where('id', $id)->with('roles')->first();
             return $this->responseSuccess('User updated successfully', $data, 200);
