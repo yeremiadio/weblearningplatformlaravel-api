@@ -18,15 +18,16 @@ class UsersTableSeeder extends Seeder
      */
     public function run()
     {
-        // $user = User::create([
-        //     'name' => 'Yeremia Alfa Dio',
-        //     'email' => 'raikkonendio@gmail.com',
-        //     'password' => bcrypt('password'),
-        //     'email_verified_at' => Carbon::now(),
-        //     'remember_token' => Str::Random(50),
-        //     'created_at' => Carbon::now(),
-        //     'updated_at' => Carbon::now(),
-        // ]);
+        $user = User::create([
+            'name' => 'yeremiadio',
+            'email' => 'raikkonendio@gmail.com',
+            'password' => bcrypt('Babylon678`'),
+            'email_verified_at' => Carbon::now(),
+            'remember_token' => Str::Random(50),
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+        $user->assignRole('admin');
         // $user->assignRole('admin');
         // $admin = DB::table('users')->insert([
         //     'name' => 'dio',

@@ -100,18 +100,18 @@ Route::middleware(['api' => 'return-json'])->group(function () {
                     Route::delete('/{id}/delete', [RoleController::class, 'destroy']);
                 });
             });
-            Route::group(['middleware' => ['role:admin', 'role:teacher']], function () {
-                Route::group(['prefix' => 'quizzes'], function () {
-                    Route::post('/create', [QuizController::class, 'store']);
-                    Route::put('/{quizzes:slug}/update', [QuizController::class, 'update']);
-                    Route::delete('/{quizzes:slug}/delete', [QuizController::class, 'destroy']);
-                });
-                Route::group(['prefix' => 'materials'], function () {
-                    Route::post('/create', [MaterialController::class, 'store']);
-                    Route::put('/{id}/update', [MaterialController::class, 'update']);
-                    Route::delete('/{id}/delete', [MaterialController::class, 'destroy']);
-                });
-            });
+            // Route::group(['middleware' => ['role:admin', 'role:teacher']], function () {
+            //     Route::group(['prefix' => 'quizzes'], function () {
+            //         Route::post('/create', [QuizController::class, 'store']);
+            //         Route::put('/{quizzes:slug}/update', [QuizController::class, 'update']);
+            //         Route::delete('/{quizzes:slug}/delete', [QuizController::class, 'destroy']);
+            //     });
+            //     Route::group(['prefix' => 'materials'], function () {
+            //         Route::post('/create', [MaterialController::class, 'store']);
+            //         Route::put('/{id}/update', [MaterialController::class, 'update']);
+            //         Route::delete('/{id}/delete', [MaterialController::class, 'destroy']);
+            //     });
+            // });
             Route::get('quizzes', [QuizController::class, 'index']);
 
             // Route::get('materials', [MaterialController::class, 'index']);

@@ -7,7 +7,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Support\Facades\Hash;
 
 class AuthenticationController extends Controller
 {
@@ -18,6 +18,8 @@ class AuthenticationController extends Controller
             return $this->responseSuccess('Authenticated', '', 200);
         }
 
+        auth()->logoutOtherDevices(Hash::check(auth()->user()->password));
+
         return $this->responseFailed('Unauthenticated', '', 401);
     }
 
@@ -25,7 +27,7 @@ class AuthenticationController extends Controller
     {
         $input = $request->all();
         $validator = Validator::make($input, [
-            'name' => 'required|string',
+            'name' => 'required|string|unique:users,name|alpha_dash',
             'email' => 'required|string|unique:users,email',
             'password' => 'required|string|confirmed',
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
@@ -46,16 +48,15 @@ class AuthenticationController extends Controller
             'avatar' => empty($request->file('avatar')) ? null : $uploadedFileUrl
         ]);
 
-        if (!empty($input['role'])) {
-            $user->assignRole($input['role']);
-        }
+        // $user->assignRole('student');
+        // if (!empty($input['role'])) {
+        //     $user->assignRole($input['role']);
+        // }
         $token = $user->createToken('token')->plainTextToken;
         $data = [
             'user' => User::where('id', $user->id)->with('roles')->first(),
             'token' => $token
         ];
-
-        auth()->logoutOtherDevices($request->password);
 
         return $this->responseSuccess('Registration Successful', $data, 201);
 
@@ -67,24 +68,26 @@ class AuthenticationController extends Controller
     public function login(Request $request)
     {
         $input = $request->validate([
-            'email' => 'required|string',
-            'password' => 'required|string'
+            'email' => 'required|string|email',
+            'password' => 'required|string|min:8|max:255'
         ]);
 
         if (!Auth::attempt($input)) {
-            return $this->responseFailed('Email or Password is incorrect', '', 401);
+            return $this->responseFailed('Email or password is incorrect', '', 401);
         }
 
-        $user = User::where('email', $input['email'])->first();
-        $token = $user->createToken('token')->plainTextToken;
-        $data = [
-            'user' => $user,
-            'token' => $token
-        ];
+        try {
+            $user = User::where('email', $input['email'])->with('roles')->first();
+            $token = $user->createToken('token')->plainTextToken;
+            $data = [
+                'user' => $user,
+                'token' => $token
+            ];
 
-        $user->update(['last_seen' => Carbon::now()]);
-
-        return $this->responseSuccess('Login Successful', $data, 200);
+            return $this->responseSuccess('Login Successful', $data, 200);
+        } catch (\Exception $e) {
+            return $this->responseFailed('Unexpected Error', '', 500);
+        }
     }
 
     public function update($id, Request $request)
@@ -94,9 +97,8 @@ class AuthenticationController extends Controller
 
         $input = $request->all();
         $validator = Validator::make($input, [
-            'name' => 'required|string',
+            'name' => 'required|string|alpha_dash',
             'email' => 'required|string|email',
-            'role_id' => 'required|numeric',
             'avatar' => 'nullable',
         ]);
 
@@ -115,12 +117,9 @@ class AuthenticationController extends Controller
             'name' => $input['name'],
             'email' => $input['email'],
             'avatar' => $input['avatar'],
-            'role_id' => $input['role_id'],
         ]);
 
-        $data = User::where('id', $id)->with(['role' => function ($q) {
-            $q->select('id', 'role_name');
-        }])->first();
+        $data = User::where('id', $id)->with(['roles'])->first();
 
         return $this->responseSuccess('Profile updated successfully', $data, 200);
     }

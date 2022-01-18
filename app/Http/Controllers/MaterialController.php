@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Material;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+
 // use Illuminate\Support\Facades\File;
 // use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
@@ -51,10 +53,10 @@ class MaterialController extends Controller
             return $this->responseFailed('Validation Error', $validator->errors(), 400);
         }
 
-        if ($request->hasFile('image')) {
+        if ($request->hasFile('thumbnail')) {
             // $input['image'] = rand() . '.' . request()->image->getClientOriginalExtension();
             // $uploadedFileUrl = Cloudinary::upload($request->file('image')->getRealPath())->getSecurePath();
-            $uploadedFileUrl = cloudinary()->upload($request->file('image')->getRealPath())->getSecurePath();
+            $uploadedFileUrl = cloudinary()->upload($request->file('thumbnail')->getRealPath())->getSecurePath();
             // dd($uploadedFileUrl);
             // request()->image->move(public_path('/images/material/'), $input['image']);
         }
@@ -64,6 +66,7 @@ class MaterialController extends Controller
             'title' => $input['title'],
             'description' => $input['description'],
             'content' => $input['content'],
+            'slug' => Str::slug($input['title']),
             'thumbnail' => $uploadedFileUrl ?? null
         ]);
 
