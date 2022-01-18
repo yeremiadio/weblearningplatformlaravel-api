@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthenticatedUserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthenticationController;
@@ -66,6 +67,10 @@ Route::middleware(['api' => 'return-json'])->group(function () {
         Route::post('verify-email', [EmailVerificationController::class, 'sendVerificationEmail']);
 
         Route::group(['middleware' => ['verified']], function () {
+
+            //Dashboard
+            Route::get('fetch-dashboard', [AuthenticatedUserController::class, 'dashboard']);
+
             Route::get('materials', [MaterialController::class, 'index']);
             Route::get('quizzes', [QuizController::class, 'index']);
             // Route::get('roles', [RoleController::class, 'index']);

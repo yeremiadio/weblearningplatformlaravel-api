@@ -8,6 +8,7 @@ use Illuminate\Database\Seeder;
 // use Illuminate\Support\Facades\DB;
 // use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Spatie\Permission\Models\Role;
 
 class UsersTableSeeder extends Seeder
 {
@@ -18,7 +19,8 @@ class UsersTableSeeder extends Seeder
      */
     public function run()
     {
-        $user = User::create([
+        //Main User
+        $user_one = User::create([
             'name' => 'yeremiadio',
             'email' => 'raikkonendio@gmail.com',
             'password' => bcrypt('Babylon678`'),
@@ -27,34 +29,24 @@ class UsersTableSeeder extends Seeder
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ]);
-        $user->assignRole('admin');
-        // $user->assignRole('admin');
-        // $admin = DB::table('users')->insert([
-        //     'name' => 'dio',
-        //     'email' => 'raikkonendio@gmail.com',
-        //     'email_verified_at' => Carbon::now(),
-        //     'remember_token' => Str::Random(50),
-        //     'password' => Hash::make('password'),
-        //     'created_at' => Carbon::now(),
-        //     'updated_at' => Carbon::now(),
-        // ]);
-        // DB::table('users')->insert([
-        //     'name' => 'teacher',
-        //     'email' => 'teacher@xyz.com',
-        //     'email_verified_at' => Carbon::now(),
-        //     'remember_token' => Str::Random(50),
-        //     'password' => Hash::make('password'),
-        //     'created_at' => Carbon::now(),
-        //     'updated_at' => Carbon::now()
-        // ]);
-        // DB::table('users')->insert([
-        //     'name' => 'student',
-        //     'email' => 'student@xyz.com',
-        //     'email_verified_at' => Carbon::now(),
-        //     'remember_token' => Str::Random(50),
-        //     'password' => Hash::make('password'),
-        //     'created_at' => Carbon::now(),
-        //     'updated_at' => Carbon::now()
-        // ]);
+        $user_one->assignRole('admin');
+        $user_two = User::create([
+            'name' => 'yeremiadio2',
+            'email' => 'raikkonendio1@gmail.com',
+            'password' => bcrypt('Babylon678`'),
+            'email_verified_at' => Carbon::now(),
+            'remember_token' => Str::Random(50),
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+        $user_two->assignRole('teacher');
+
+        //User Factory
+        foreach (Role::all() as $role) {
+            $users = User::factory()->count(30)->create();
+            foreach ($users as $user) {
+                $user->assignRole($role);
+            }
+        }
     }
 }
