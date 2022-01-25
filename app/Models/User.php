@@ -44,8 +44,13 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
     ];
 
-    public function code_histories()
+    public function codes()
     {
-        return $this->hasMany(CodeHistories::class);
+        return $this->hasMany(Code::class);
     }
+
+    // public function code_histories()
+    // {
+    //     return $this->hasMany(CodeHistories::class);
+    // }
 }

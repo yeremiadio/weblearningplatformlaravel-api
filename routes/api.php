@@ -42,7 +42,7 @@ Route::middleware(['api' => 'return-json'])->group(function () {
     Route::post('upload', [ImageUploadController::class, 'upload']);
 
 
-    Route::post('code', function (Request $request) {
+    Route::post('code-glot', function (Request $request) {
         $input = $request->all();
         $response = Http::withHeaders([
             'Authorization' => env('GLOT_AUTH_TOKEN'),
@@ -59,8 +59,13 @@ Route::middleware(['api' => 'return-json'])->group(function () {
 
         Route::get('auth-check', [AuthenticationController::class, 'checkAuth']);
         Route::get('roles', [RoleController::class, 'index']);
+        Route::group(['prefix' => 'code'], function () {
+            Route::get('histories', [CodeController::class, 'getUserCodes']);
+            Route::post('create', [CodeController::class, 'store']);
+        });
 
-        Route::get('code/histories', [CodeHistoryController::class, 'getCodeHistories']);
+
+        // Route::get('code/histories', [CodeHistoryController::class, 'getCodeHistories']);
         Route::post('code/histories/create', [CodeHistoryController::class, 'store']);
 
         //Email Verification

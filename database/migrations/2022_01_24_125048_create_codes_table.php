@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCodeHistoriesTable extends Migration
+class CreateCodesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,13 @@ class CreateCodeHistoriesTable extends Migration
      */
     public function up()
     {
-        Schema::create('code_histories', function (Blueprint $table) {
+        Schema::create('codes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('title');
-            $table->longText('description');
-            $table->longText('code');
+            $table->string('code');
+            $table->string('slug');
+            $table->string('description')->nullable();
+            $table->foreignId('user_id')->nullable();
             $table->timestamps();
         });
     }
@@ -30,6 +31,6 @@ class CreateCodeHistoriesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('code_histories');
+        Schema::dropIfExists('codes');
     }
 }

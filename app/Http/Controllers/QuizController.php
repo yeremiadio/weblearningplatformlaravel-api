@@ -128,6 +128,39 @@ class QuizController extends Controller
         }
     }
 
+    public function storeCodeQuiz(Request $request)
+    {
+        $input = $request->all();
+        $validator = Validator::make($input, [
+            'type' => 'required|string',
+            'title' => 'required|string',
+            'deadline' => 'required|date',
+            'thumbnail' => 'nullable|mimes:png,jpg,jpeg|image|max:2048',
+            'questions' => 'required|array|between:1,10',
+            'questions.*.question' => 'required|string',
+            'questions.*.file' => 'nullable|mimes:jpeg,png,jpg,doc,docx,pdf',
+            'questions.*.options' => 'sometimes|array|between:1,5',
+            'questions.*.options.*.title' => 'required|string',
+            'questions.*.options.*.correct' => 'required',
+        ]);
+        if ($validator->fails()){
+            $this->responseFailed('Validator fail','',400);
+        }
+
+        try {
+            // $quiz = Quiz::create([
+
+            // ])
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
+    }
+
+    public function getCodeQuiz(Request $request)
+    {
+
+    }
+
     public function show($slug)
     {
         $quiz = Quiz::where('slug', $slug)->first();

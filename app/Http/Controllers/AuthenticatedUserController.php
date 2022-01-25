@@ -35,10 +35,8 @@ class AuthenticatedUserController extends Controller
         $all_roles_in_database = Role::all()->pluck('name');
         $all_roles_count = [];
         foreach ($all_roles_in_database as $value) {
-            $role = [
-                $value => count(User::role($value)->get())
-            ];
-            array_push($all_roles_count, $role);
+            // $role = ;
+            array_push($all_roles_count, count(User::role($value)->get()));
         }
 
         //Material Count by month
@@ -61,7 +59,10 @@ class AuthenticatedUserController extends Controller
 
         $data = [
             'all_data_count' => $dataCount,
-            'all_roles_count' => $all_roles_count,
+            'all_roles_count' => [
+                'names' => $all_roles_in_database,
+                'count' => $all_roles_count
+            ],
             'data_materials_count_by_month' => $data_materials_count,
         ];
         return $this->responseSuccess('Data Fetched Successfully', $data, 200);

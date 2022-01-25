@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Code;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class CodeController extends Controller
 {
@@ -26,6 +29,12 @@ class CodeController extends Controller
         //
     }
 
+    public function getUserCodes()
+    {
+        $data = Code::where('user_id', auth()->user()->id)->get();
+        return $this->responseSuccess('Fetched data successfully', $data, 200);
+    }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -34,7 +43,30 @@ class CodeController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $input = $request->all();
+        $validator = Validator::make($input, [
+            'title' => 'string|required',
+            'code' => 'string|required',
+        ]);
+        if ($validator->fails()) {
+            return $this->responseFailed('Validator error', '', 400);
+        }
+
+        $titleCode = $input['title'] ?? 'untitled' . '-' . uniqid();
+
+        try {
+            $code = Code::create([
+                'title' => $titleCode,
+                'slug' => Str::slug($titleCode),
+                'code' => $input['code'],
+                'description' => $input['description'],
+                'user_id' => auth()->id()
+            ]);
+            $data = Code::where('id', $code->id)->with('user')->first();
+            return $this->responseSuccess('Success create code', $data, 201);
+        } catch (\Exception $e) {
+            return $this->responseFailed($e);
+        }
     }
 
     /**
