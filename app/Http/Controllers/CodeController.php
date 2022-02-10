@@ -16,7 +16,8 @@ class CodeController extends Controller
      */
     public function index()
     {
-        //
+        $data = Code::all();
+        return $this->responseSuccess('Codes Data', $data, 200);
     }
 
     /**
@@ -46,11 +47,10 @@ class CodeController extends Controller
         $input = $request->all();
         $validator = Validator::make($input, [
             'title' => 'string|required',
-            'code' => 'required',
             'type' => 'required|string'
         ]);
         if ($validator->fails()) {
-            return $this->responseFailed('Validator error', '', 400);
+            return $this->responseFailed('Validator error', $validator->errors(), 400);
         }
         $titleCode = $input['title'];
         try {
@@ -85,6 +85,24 @@ class CodeController extends Controller
         } catch (\ErrorException $e) {
             return $this->responseFailed('Response error', $e, 500);
         }
+    }
+
+    public function storeWebPageBuilder(Request $request, $slug)
+    {
+        $code = Code::where('slug', $slug)->first();
+        $code->update([
+            'type' => 'webpage-builder',
+            'code' => json_encode($request->all())
+        ]);
+        //
+        $data = Code::where('slug', $code->slug)->first();
+        return response()->json($data);
+    }
+
+    public function loadWebPageBuilder($slug)
+    {
+        $data = Code::where('slug', $slug)->first();
+        return response($data->code, 200)->header('Content-Type', 'application/json');
     }
 
     /**

@@ -50,7 +50,9 @@ Route::middleware(['api' => 'return-json'])->group(function () {
 
         return response()->json($response->json(), 200);
     });
-
+    Route::get('codes', [CodeController::class, 'index']);
+    Route::get('code/single/{slug}', [CodeController::class, 'show']);
+    Route::get('materials', [MaterialController::class, 'index']);
     Route::get('verify-email/{id}/{hash}', [EmailVerificationController::class, 'verify'])->name('verification.verify');
 
 
@@ -60,12 +62,14 @@ Route::middleware(['api' => 'return-json'])->group(function () {
         Route::get('roles', [RoleController::class, 'index']);
         Route::group(['prefix' => 'code'], function () {
             Route::get('histories', [CodeController::class, 'getUserCodes']);
-            Route::get('/{slug}', [CodeController::class, 'show']);
             Route::post('create', [CodeController::class, 'store']);
-            Route::put('/{slug}/update', [CodeController::class, 'update']);
-            Route::delete('/{id}/delete', [CodeController::class, 'destroy']);
-        });
 
+            Route::get('webpage-builder/{slug}', [CodeController::class, 'loadWebPageBuilder']);
+            Route::post('webpage-builder/{slug}/store', [CodeController::class, 'storeWebPageBuilder']);
+
+            Route::put('{slug}/update', [CodeController::class, 'update']);
+            Route::delete('{id}/delete', [CodeController::class, 'destroy']);
+        });
 
         // Route::get('code/histories', [CodeHistoryController::class, 'getCodeHistories']);
         Route::post('code/histories/create', [CodeHistoryController::class, 'store']);
