@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Code;
 use App\Models\CodeHistories;
 use App\Models\Material;
 use App\Models\Quiz;
@@ -20,7 +21,7 @@ class AuthenticatedUserController extends Controller
         $role_count = count(Role::all());
         $material_count = count(Material::all());
         $quiz_count = count(Quiz::all());
-        $code_histories_count = count(CodeHistories::all());
+        $code_histories_count = count(Code::all());
 
         $dataCount = [
             'user' => +$user_count,

@@ -18,6 +18,7 @@ class CreateCodesTable extends Migration
             $table->string('title');
             $table->string('code');
             $table->string('slug');
+            $table->enum('type', ['frontend', 'js', 'webpage-builder']);
             $table->string('description')->nullable();
             $table->foreignId('user_id')->nullable();
             $table->timestamps();

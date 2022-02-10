@@ -46,24 +46,24 @@ class CodeController extends Controller
         $input = $request->all();
         $validator = Validator::make($input, [
             'title' => 'string|required',
-            'code' => 'string|required',
+            'code' => 'required',
+            'type' => 'required|string'
         ]);
         if ($validator->fails()) {
             return $this->responseFailed('Validator error', '', 400);
         }
-
-        $titleCode = $input['title'] ?? 'untitled' . '-' . uniqid();
-
+        $titleCode = $input['title'];
         try {
             $code = Code::create([
                 'title' => $titleCode,
-                'slug' => Str::slug($titleCode),
+                'slug' => Str::slug($titleCode) . '-' . uniqid(),
                 'code' => $input['code'],
-                'description' => $input['description'],
+                'type' => $input['type'],
+                'description' => $input['description'] ?? null,
                 'user_id' => auth()->id()
             ]);
             $data = Code::where('id', $code->id)->with('user')->first();
-            return $this->responseSuccess('Success create code', $data, 201);
+            return $this->responseSuccess('Code saved successfully', $data, 201);
         } catch (\Exception $e) {
             return $this->responseFailed($e);
         }
@@ -75,9 +75,16 @@ class CodeController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($slug)
     {
-        //
+        try {
+            $data = Code::where([
+                'slug' => $slug,
+            ])->first();
+            return $this->responseSuccess('Fetched Code Successfully', $data, 200);
+        } catch (\ErrorException $e) {
+            return $this->responseFailed('Response error', $e, 500);
+        }
     }
 
     /**
@@ -98,9 +105,41 @@ class CodeController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $slug)
     {
-        //
+        $code = Code::where([
+            'slug' => $slug,
+            'user_id' => auth()->user()->id
+        ])->with('user')->first();
+        if (!$code) return $this->responseFailed('Data not found', '', 404);
+
+        $input = $request->all();
+        $validator = Validator::make($input, [
+            'title' => 'string|required',
+            'code' => 'required',
+            'type' => 'required|string'
+        ]);
+        if ($validator->fails()) {
+            return $this->responseFailed('Validator error', $validator->errors(), 400);
+        }
+        $titleCode = $input['title'];
+        try {
+            $code->update([
+                'title' => $titleCode,
+                'slug' => Str::slug($titleCode) . '-' . uniqid(),
+                'code' => $input['code'],
+                'type' => $input['type'],
+                'description' => $input['description'] ?? null,
+                'user_id' => auth()->id()
+            ]);
+            $data = Code::where([
+                'slug' => $code->slug,
+                'user_id' => auth()->user()->id
+            ])->with('user')->first();
+            return $this->responseSuccess('Code updated successfully', $data, 200);
+        } catch (\Exception $e) {
+            return $this->responseFailed($e);
+        }
     }
 
     /**
@@ -111,6 +150,11 @@ class CodeController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $code = Code::where('id', $id)->first();
+        if (!$code) return $this->responseFailed('Data not found', '', 404);
+
+        $code->delete();
+
+        return $this->responseSuccess('Data has been deleted');
     }
 }

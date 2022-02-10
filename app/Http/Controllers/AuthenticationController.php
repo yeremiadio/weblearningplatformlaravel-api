@@ -83,7 +83,7 @@ class AuthenticationController extends Controller
                 'user' => $user,
                 'token' => $token
             ];
-
+            Auth::logoutOtherDevices($input['password']);
             return $this->responseSuccess('Login Successful', $data, 200);
         } catch (\Exception $e) {
             return $this->responseFailed('Unexpected Error', '', 500);

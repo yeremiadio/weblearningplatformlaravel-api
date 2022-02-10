@@ -41,7 +41,6 @@ Route::middleware(['api' => 'return-json'])->group(function () {
 
     Route::post('upload', [ImageUploadController::class, 'upload']);
 
-
     Route::post('code-glot', function (Request $request) {
         $input = $request->all();
         $response = Http::withHeaders([
@@ -61,12 +60,16 @@ Route::middleware(['api' => 'return-json'])->group(function () {
         Route::get('roles', [RoleController::class, 'index']);
         Route::group(['prefix' => 'code'], function () {
             Route::get('histories', [CodeController::class, 'getUserCodes']);
+            Route::get('/{slug}', [CodeController::class, 'show']);
             Route::post('create', [CodeController::class, 'store']);
+            Route::put('/{slug}/update', [CodeController::class, 'update']);
+            Route::delete('/{id}/delete', [CodeController::class, 'destroy']);
         });
 
 
         // Route::get('code/histories', [CodeHistoryController::class, 'getCodeHistories']);
         Route::post('code/histories/create', [CodeHistoryController::class, 'store']);
+
 
         //Email Verification
         Route::post('verify-email', [EmailVerificationController::class, 'sendVerificationEmail']);
