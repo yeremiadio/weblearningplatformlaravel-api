@@ -108,6 +108,7 @@ Route::middleware(['api' => 'return-json'])->group(function () {
                 });
                 Route::group(['prefix' => 'materials'], function () {
                     Route::post('/create', [MaterialController::class, 'store']);
+                    Route::get('/screenshot', [MaterialController::class, 'storeScreenshotPage']);
                     Route::put('/{id}/update', [MaterialController::class, 'update']);
                     Route::delete('/{id}/delete', [MaterialController::class, 'destroy']);
                 });

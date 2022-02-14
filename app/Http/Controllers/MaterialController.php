@@ -6,7 +6,7 @@ use App\Models\Material;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-use ImageKit\ImageKit;
+use Spatie\Browsershot\Browsershot;
 
 // use Illuminate\Support\Facades\File;
 // use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
@@ -20,8 +20,12 @@ class MaterialController extends Controller
      */
     public function index()
     {
-        $data = Material::all();
-        return $this->responseSuccess('Materials Data', $data, 200);
+        $product = Material::latest()->filter(request(['search', 'sort', 'orderby']))->paginate(request('limit' ?? 6));
+        if (!$product) return $this->responseFailed('Data not found', '', 404);
+
+        return $this->responseSuccess('List Materials', $product, 200);
+        // $data = Material::latest()->filter(request(['search']));
+        // return $this->responseSuccess('Materials Data', $data, 200);
     }
 
     /**
@@ -80,6 +84,9 @@ class MaterialController extends Controller
         //
     }
 
+    public function storeScreenshotPage(Request $request)
+    { }
+
     /**
      * Show the form for editing the specified resource.
      *
@@ -119,10 +126,6 @@ class MaterialController extends Controller
 
         if ($request->hasFile('thumbnail')) {
             $input['thumbnail'] = cloudinary()->upload($request->file('thumbnail')->getRealPath())->getSecurePath();
-            // File::delete('/images/material/' . $oldImage);
-            // $input['image'] = rand() . '.' . request()->image->getClientOriginalExtension();
-
-            // request()->image->move(public_path('/images/material/'), $input['image']);
         } else {
             $input['thumbnail'] = $oldThubmanil;
         }
@@ -144,10 +147,6 @@ class MaterialController extends Controller
     {
         $material = Material::where('id', $id)->first();
         if (!$material) return $this->responseFailed('Data not found', '', 404);
-
-        // if ($material->image) {
-        //     File::delete('/images/materi/' . $material->image);
-        // }
 
         $material->delete();
 
