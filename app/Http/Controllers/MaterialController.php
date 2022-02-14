@@ -24,8 +24,6 @@ class MaterialController extends Controller
         if (!$product) return $this->responseFailed('Data not found', '', 404);
 
         return $this->responseSuccess('List Materials', $product, 200);
-        // $data = Material::latest()->filter(request(['search']));
-        // return $this->responseSuccess('Materials Data', $data, 200);
     }
 
     /**
