@@ -9,7 +9,6 @@ use App\Http\Controllers\CodeHistoryController;
 use App\Http\Controllers\EmailVerificationController;
 use App\Http\Controllers\ImageUploadController;
 use App\Http\Controllers\MaterialController;
-use App\Http\Controllers\PageController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
@@ -32,12 +31,6 @@ Route::middleware(['api' => 'return-json'])->group(function () {
     Route::post('/register', [AuthenticationController::class, 'register']);
     //login user
     Route::post('/login', [AuthenticationController::class, 'login']);
-    Route::group(['prefix' => 'pages'], function () {
-        Route::get('/', [PageController::class, 'index']);
-        Route::get('/{slug}', [PageController::class, 'show']);
-        Route::get('/{slug}/content', [PageController::class, 'loadContent']);
-        Route::post('/{slug}/content', [PageController::class, 'changeContent']);
-    });
 
     Route::post('upload', [ImageUploadController::class, 'upload']);
 
@@ -51,8 +44,9 @@ Route::middleware(['api' => 'return-json'])->group(function () {
         return response()->json($response->json(), 200);
     });
     Route::get('codes', [CodeController::class, 'index']);
-    Route::get('code/single/{slug}', [CodeController::class, 'show']);
     Route::get('materials', [MaterialController::class, 'index']);
+    Route::get('materials/single/{id}', [MaterialController::class, 'show']);
+    Route::get('code/single/{slug}', [CodeController::class, 'show']);
     Route::get('verify-email/{id}/{hash}', [EmailVerificationController::class, 'verify'])->name('verification.verify');
 
 
@@ -82,8 +76,6 @@ Route::middleware(['api' => 'return-json'])->group(function () {
 
             //Dashboard
             Route::get('fetch-dashboard', [AuthenticatedUserController::class, 'dashboard']);
-
-            Route::get('materials', [MaterialController::class, 'index']);
             Route::get('quizzes', [QuizController::class, 'index']);
             // Route::get('roles', [RoleController::class, 'index']);
             Route::get('quizzes/{quizzes:slug}', [QuizController::class, 'show']);
@@ -107,6 +99,7 @@ Route::middleware(['api' => 'return-json'])->group(function () {
                     Route::delete('/{id}/delete', [UserController::class, 'destroy']);
                 });
                 Route::group(['prefix' => 'materials'], function () {
+                    Route::get('/latest', [MaterialController::class, 'indexWithFilter']);
                     Route::post('/create', [MaterialController::class, 'store']);
                     Route::get('/screenshot', [MaterialController::class, 'storeScreenshotPage']);
                     Route::put('/{id}/update', [MaterialController::class, 'update']);
@@ -131,8 +124,6 @@ Route::middleware(['api' => 'return-json'])->group(function () {
             //     });
             // });
             Route::get('quizzes', [QuizController::class, 'index']);
-
-            // Route::get('materials', [MaterialController::class, 'index']);
         });
 
         Route::post('/logout', [AuthenticationController::class, 'logout']);

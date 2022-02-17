@@ -20,10 +20,17 @@ class MaterialController extends Controller
      */
     public function index()
     {
-        $product = Material::latest()->filter(request(['search', 'sort', 'orderby']))->paginate(request('limit' ?? 6));
-        if (!$product) return $this->responseFailed('Data not found', '', 404);
+        $materials = Material::all();
+        if (!$materials) return $this->responseFailed('Data not found', '', 404);
 
-        return $this->responseSuccess('List Materials', $product, 200);
+        return $this->responseSuccess('List Materials', $materials, 200);
+    }
+    public function indexWithFilter()
+    {
+        $materials = Material::latest()->filter(request(['search', 'sort', 'orderby']))->paginate(request('limit' ?? 6));
+        if (!$materials) return $this->responseFailed('Data not found', '', 404);
+
+        return $this->responseSuccess('List Materials', $materials, 200);
     }
 
     /**
@@ -77,9 +84,14 @@ class MaterialController extends Controller
      * @param  \App\Models\Material  $material
      * @return \Illuminate\Http\Response
      */
-    public function show(Material $material)
+    public function show($id)
     {
-        //
+        $material = Material::where('id', $id)->get();
+        if ($material) {
+            $this->responseFailed('Data not found');
+        }
+
+        return $this->responseSuccess('Data fetched Successfully', $material);
     }
 
     public function storeScreenshotPage(Request $request)
