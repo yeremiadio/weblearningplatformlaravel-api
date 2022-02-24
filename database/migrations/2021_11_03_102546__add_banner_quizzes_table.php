@@ -14,7 +14,7 @@ class AddBannerQuizzesTable extends Migration
     public function up()
     {
         Schema::table('quizzes', function (Blueprint $table) {
-            $table->string('thumbnail')->nullable()->after('deadline');
+            $table->string('thumbnail')->nullable()->after('type');
         });
     }
 

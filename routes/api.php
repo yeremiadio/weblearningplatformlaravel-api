@@ -45,19 +45,22 @@ Route::middleware(['api' => 'return-json'])->group(function () {
     });
     Route::get('codes', [CodeController::class, 'index']);
     Route::get('materials', [MaterialController::class, 'index']);
-    Route::get('materials/single/{id}', [MaterialController::class, 'show']);
+    Route::get('materials/single/{materials:id}', [MaterialController::class, 'show']);
+    Route::get('quizzes', [QuizController::class, 'index']);
+    Route::get('quizzes/{quizzes:slug}', [QuizController::class, 'show']);
     Route::get('code/single/{slug}', [CodeController::class, 'show']);
     Route::get('verify-email/{id}/{hash}', [EmailVerificationController::class, 'verify'])->name('verification.verify');
 
 
     Route::group(['middleware' => ['auth:sanctum']], function () {
 
+        //Dashboard
+        Route::get('fetch-dashboard', [AuthenticatedUserController::class, 'dashboard']);
         Route::get('auth-check', [AuthenticationController::class, 'checkAuth']);
         Route::get('roles', [RoleController::class, 'index']);
         Route::group(['prefix' => 'code'], function () {
             Route::get('histories', [CodeController::class, 'getUserCodes']);
             Route::post('create', [CodeController::class, 'store']);
-
             Route::get('webpage-builder/{slug}', [CodeController::class, 'loadWebPageBuilder']);
             Route::post('webpage-builder/{slug}/store', [CodeController::class, 'storeWebPageBuilder']);
 
@@ -73,12 +76,6 @@ Route::middleware(['api' => 'return-json'])->group(function () {
         Route::post('verify-email', [EmailVerificationController::class, 'sendVerificationEmail']);
 
         Route::group(['middleware' => ['verified']], function () {
-
-            //Dashboard
-            Route::get('fetch-dashboard', [AuthenticatedUserController::class, 'dashboard']);
-            Route::get('quizzes', [QuizController::class, 'index']);
-            // Route::get('roles', [RoleController::class, 'index']);
-            Route::get('quizzes/{quizzes:slug}', [QuizController::class, 'show']);
             Route::get('users', [UserController::class, 'index']);
             Route::get('users/{id}', [UserController::class, 'show']);
             Route::put('profile/{id}/update', [AuthenticationController::class, 'update']);
@@ -110,22 +107,26 @@ Route::middleware(['api' => 'return-json'])->group(function () {
                     Route::put('/{id}/update', [RoleController::class, 'update']);
                     Route::delete('/{id}/delete', [RoleController::class, 'destroy']);
                 });
+                Route::group(['prefix' => 'quizzes'], function () {
+                    Route::post('/create', [QuizController::class, 'store']);
+                    Route::put('/{quizzes:slug}/update', [QuizController::class, 'update']);
+                    Route::delete('/{quizzes:slug}/delete', [QuizController::class, 'destroy']);
+                });
             });
-            // Route::group(['middleware' => ['role:admin', 'role:teacher']], function () {
-            //     Route::group(['prefix' => 'quizzes'], function () {
-            //         Route::post('/create', [QuizController::class, 'store']);
-            //         Route::put('/{quizzes:slug}/update', [QuizController::class, 'update']);
-            //         Route::delete('/{quizzes:slug}/delete', [QuizController::class, 'destroy']);
-            //     });
+        });
+
+        Route::post('/logout', [AuthenticationController::class, 'logout']);
+    });
+});
+
+
+
+
+  // Route::group(['middleware' => ['role:admin', 'role:teacher']], function () {
+
             //     Route::group(['prefix' => 'materials'], function () {
             //         Route::post('/create', [MaterialController::class, 'store']);
             //         Route::put('/{id}/update', [MaterialController::class, 'update']);
             //         Route::delete('/{id}/delete', [MaterialController::class, 'destroy']);
             //     });
             // });
-            Route::get('quizzes', [QuizController::class, 'index']);
-        });
-
-        Route::post('/logout', [AuthenticationController::class, 'logout']);
-    });
-});

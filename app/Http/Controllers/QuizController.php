@@ -26,9 +26,18 @@ class QuizController extends Controller
             }, 'questions.options' => function ($q) {
                 $q->select('id', 'question_id', 'title', 'correct');
             }])->get();
-        } else {
+        }
+        if (request()->type == 'essay') {
             $data = Quiz::where('type', 'essay')->with(['questions' => function ($q) {
                 $q->select('id', 'quiz_id', 'question', 'file');
+            }, 'questions.options' => function ($q) {
+                $q->select('id', 'question_id', 'title', 'correct');
+            }])->get();
+        } else {
+            $data = Quiz::with(['questions' => function ($q) {
+                $q->select('id', 'quiz_id', 'question', 'file');
+            }, 'questions.options' => function ($q) {
+                $q->select('id', 'question_id', 'title', 'correct');
             }])->get();
         }
 
@@ -41,7 +50,8 @@ class QuizController extends Controller
         $validator = Validator::make($input, [
             'type' => 'required|string',
             'title' => 'required|string',
-            'deadline' => 'required|date',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date',
             'thumbnail' => 'nullable|mimes:jpeg,png,jpg',
             'questions' => 'required|array|between:1,10',
             'questions.*.question' => 'required|string',
@@ -62,7 +72,6 @@ class QuizController extends Controller
             if ($request->hasFile('thumbnail')) {
                 $input['thumbnail'] = cloudinary()->upload($request->file('thumbnail')->getRealPath())->getSecurePath();
                 // $input['banner'] = rand() . '.' . request()->banner->getClientOriginalExtension();
-
                 // request()->banner->move(public_path('assets/images/quiz/'), $input['banner']);
             }
 
@@ -70,7 +79,9 @@ class QuizController extends Controller
                 'title' => $input['title'],
                 'slug' =>  Str::slug($input['title']) . '-' . uniqid(),
                 'type' => $input['type'],
-                'deadline' => $input['deadline'],
+                'start_date' => $input['end_date'],
+                'end_date' => $input['start_date'],
+                'duration' => $input['duration'],
                 'thumbnail' => $input['thumbnail']
             ]);
 
@@ -79,14 +90,12 @@ class QuizController extends Controller
                 if ($request->hasFile('questions.' . $key . '.file') && $quiz->type == 'quiz') {
                     $questionValue['file'] = cloudinary()->upload($request->file('questions.' . $key . '.file')->getRealPath())->getSecurePath();
                     // $questionValue['file'] = rand().'.'.$request->questions[$key]['file']->getClientOriginalExtension();
-
                     // $request->questions[$key]['file']->move(public_path('assets/files/quiz/'), $questionValue['file']);
                 }
 
                 if ($request->hasFile('questions.' . $key . '.file') && $quiz->type == 'essay') {
                     $questionValue['file'] = cloudinary()->uploadFile($request->file('questions.' . $key . '.file')->getRealPath())->getSecurePath();
                     // $questionValue['file'] = rand().'.'.$request->questions[$key]['file']->getClientOriginalExtension();
-
                     // $request->questions[$key]['file']->move(public_path('assets/files/quiz/'), $questionValue['file']);
                 }
 
@@ -134,7 +143,6 @@ class QuizController extends Controller
         $validator = Validator::make($input, [
             'type' => 'required|string',
             'title' => 'required|string',
-            'deadline' => 'required|date',
             'thumbnail' => 'nullable|mimes:png,jpg,jpeg|image|max:2048',
             'questions' => 'required|array|between:1,10',
             'questions.*.question' => 'required|string',
@@ -143,8 +151,8 @@ class QuizController extends Controller
             'questions.*.options.*.title' => 'required|string',
             'questions.*.options.*.correct' => 'required',
         ]);
-        if ($validator->fails()){
-            $this->responseFailed('Validator fail','',400);
+        if ($validator->fails()) {
+            $this->responseFailed('Validator fail', '', 400);
         }
 
         try {
@@ -157,9 +165,7 @@ class QuizController extends Controller
     }
 
     public function getCodeQuiz(Request $request)
-    {
-
-    }
+    { }
 
     public function show($slug)
     {
@@ -200,7 +206,8 @@ class QuizController extends Controller
         $input = $request->all();
         $validator = Validator::make($input, [
             'title' => 'required|string',
-            'deadline' => 'required|date',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date',
             'thumbnail' => 'nullable|mimes:jpeg,png,jpg',
             'questions' => 'required|array|between:1,10',
             'questions.*.id' => 'required|numeric',
@@ -233,7 +240,8 @@ class QuizController extends Controller
 
             $quiz->update([
                 'title' => $input['title'],
-                'deadline' => $input['deadline'],
+                'start_date' => $input['end_date'],
+                'end_date' => $input['start_date'],
                 'thumbnail' => $input['thumbnail']
             ]);
 

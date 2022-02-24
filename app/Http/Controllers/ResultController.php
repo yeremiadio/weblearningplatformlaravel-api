@@ -25,7 +25,7 @@ class ResultController extends Controller
             return $this->responseFailed('Submit failed', 'User already submitted this quiz', 400);
         }
 
-        $isAvailable = Carbon::parse($quiz->deadline)->toDateTimeString() > Carbon::now()->toDateTimeString() ? true : false;
+        $isAvailable = Carbon::parse($quiz->end_date)->toDateTimeString() > Carbon::now()->toDateTimeString() ? true : false;
         if (!$isAvailable) {
             return $this->responseFailed('Submit failed', 'Deadline has passed', 400);
         }

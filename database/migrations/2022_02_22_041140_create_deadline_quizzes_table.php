@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddDateQuizTable extends Migration
+class CreateDeadlineQuizzesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,8 @@ class AddDateQuizTable extends Migration
     public function up()
     {
         Schema::table('quizzes', function (Blueprint $table) {
-            $table->timestamp('deadline')->nullable()->after('type');
+            $table->timestamp('start_date')->nullable()->after('type');
+            $table->timestamp('end_date')->nullable()->after('start_date');
         });
     }
 
@@ -24,7 +25,5 @@ class AddDateQuizTable extends Migration
      * @return void
      */
     public function down()
-    {
-        //
-    }
+    { }
 }
