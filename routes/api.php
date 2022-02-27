@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthenticationController;
 use App\Http\Controllers\CodeController;
+use App\Http\Controllers\ResultController;
 use App\Http\Controllers\CodeHistoryController;
 use App\Http\Controllers\EmailVerificationController;
 use App\Http\Controllers\ImageUploadController;
@@ -46,8 +47,7 @@ Route::middleware(['api' => 'return-json'])->group(function () {
     Route::get('codes', [CodeController::class, 'index']);
     Route::get('materials', [MaterialController::class, 'index']);
     Route::get('materials/single/{materials:id}', [MaterialController::class, 'show']);
-    Route::get('quizzes', [QuizController::class, 'index']);
-    Route::get('quizzes/{quizzes:slug}', [QuizController::class, 'show']);
+
     Route::get('code/single/{slug}', [CodeController::class, 'show']);
     Route::get('verify-email/{id}/{hash}', [EmailVerificationController::class, 'verify'])->name('verification.verify');
 
@@ -76,6 +76,15 @@ Route::middleware(['api' => 'return-json'])->group(function () {
         Route::post('verify-email', [EmailVerificationController::class, 'sendVerificationEmail']);
 
         Route::group(['middleware' => ['verified']], function () {
+            Route::get('quizzes', [QuizController::class, 'index']);
+            Route::get('quizzes/single/{quizzes:slug}', [QuizController::class, 'show']);
+            Route::group(['prefix' => 'result'], function () {
+                Route::post('/{quizzes:slug}/quiz', [ResultController::class, 'quizStore']);
+                Route::get('/{quizzes:slug}/notsubmitted', [ResultController::class, 'resultNotSubmitted']);
+                Route::get('/{quizzes:slug}/quiz', [ResultController::class, 'quizResultSubmitted']);
+                Route::get('/{quizzes:slug}/essay', [ResultController::class, 'essayResultSubmitted']);
+                Route::put('/{results:id}', [ResultController::class, 'createScoreEssay']);
+            });
             Route::get('users', [UserController::class, 'index']);
             Route::get('users/{id}', [UserController::class, 'show']);
             Route::put('profile/{id}/update', [AuthenticationController::class, 'update']);

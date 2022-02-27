@@ -25,7 +25,7 @@ class QuizController extends Controller
                 $q->select('id', 'quiz_id', 'question', 'file');
             }, 'questions.options' => function ($q) {
                 $q->select('id', 'question_id', 'title', 'correct');
-            }])->get();
+            }, 'results'])->get();
         }
         if (request()->type == 'essay') {
             $data = Quiz::where('type', 'essay')->with(['questions' => function ($q) {
@@ -38,6 +38,8 @@ class QuizController extends Controller
                 $q->select('id', 'quiz_id', 'question', 'file');
             }, 'questions.options' => function ($q) {
                 $q->select('id', 'question_id', 'title', 'correct');
+            }, 'results' => function ($q) {
+                $q->select('id', 'user_id', 'quiz_id', 'score', 'created_at')->where('user_id', auth()->user()->id);
             }])->get();
         }
 
@@ -57,7 +59,6 @@ class QuizController extends Controller
             'questions.*.question' => 'required|string',
             'questions.*.file' => 'nullable|mimes:jpeg,png,jpg,doc,docx,pdf',
             'questions.*.options' => 'sometimes|array|between:1,5',
-            'questions.*.options.*.title' => 'required|string',
             'questions.*.options.*.correct' => 'required',
         ]);
 
@@ -79,25 +80,17 @@ class QuizController extends Controller
                 'title' => $input['title'],
                 'slug' =>  Str::slug($input['title']) . '-' . uniqid(),
                 'type' => $input['type'],
-                'start_date' => $input['end_date'],
-                'end_date' => $input['start_date'],
-                'duration' => $input['duration'],
+                'start_date' => $input['start_date'],
+                'end_date' => $input['end_date'],
                 'thumbnail' => $input['thumbnail']
             ]);
 
             foreach ($input['questions'] as $key => $questionValue) {
                 $questionValue['file'] = null;
-                if ($request->hasFile('questions.' . $key . '.file') && $quiz->type == 'quiz') {
+                if ($request->hasFile('questions.' . $key . '.file')) {
                     $questionValue['file'] = cloudinary()->upload($request->file('questions.' . $key . '.file')->getRealPath())->getSecurePath();
-                    // $questionValue['file'] = rand().'.'.$request->questions[$key]['file']->getClientOriginalExtension();
-                    // $request->questions[$key]['file']->move(public_path('assets/files/quiz/'), $questionValue['file']);
                 }
 
-                if ($request->hasFile('questions.' . $key . '.file') && $quiz->type == 'essay') {
-                    $questionValue['file'] = cloudinary()->uploadFile($request->file('questions.' . $key . '.file')->getRealPath())->getSecurePath();
-                    // $questionValue['file'] = rand().'.'.$request->questions[$key]['file']->getClientOriginalExtension();
-                    // $request->questions[$key]['file']->move(public_path('assets/files/quiz/'), $questionValue['file']);
-                }
 
                 $question = Question::create([
                     'quiz_id' => $quiz->id,
@@ -105,7 +98,7 @@ class QuizController extends Controller
                     'file' => $questionValue['file']
                 ]);
 
-                if ($quiz->type == 'quiz') {
+                if ($quiz->type === 'quiz') {
                     foreach ($questionValue['options'] as $optionValue) {
                         Option::create([
                             'question_id' => $question->id,
