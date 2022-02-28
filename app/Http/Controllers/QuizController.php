@@ -40,6 +40,7 @@ class QuizController extends Controller
                 $q->select('id', 'question_id', 'title', 'correct');
             }, 'results' => function ($q) {
                 $q->select('id', 'user_id', 'quiz_id', 'score', 'created_at')->where('user_id', auth()->user()->id);
+                $q->orderBy('created_at', 'asc');
             }])->get();
         }
 

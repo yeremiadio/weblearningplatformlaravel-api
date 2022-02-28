@@ -46,7 +46,7 @@ Route::middleware(['api' => 'return-json'])->group(function () {
     });
     Route::get('codes', [CodeController::class, 'index']);
     Route::get('materials', [MaterialController::class, 'index']);
-    Route::get('materials/single/{materials:id}', [MaterialController::class, 'show']);
+    Route::get('materials/single/{materials:slug}', [MaterialController::class, 'show']);
 
     Route::get('code/single/{slug}', [CodeController::class, 'show']);
     Route::get('verify-email/{id}/{hash}', [EmailVerificationController::class, 'verify'])->name('verification.verify');
@@ -80,6 +80,7 @@ Route::middleware(['api' => 'return-json'])->group(function () {
             Route::get('quizzes/single/{quizzes:slug}', [QuizController::class, 'show']);
             Route::group(['prefix' => 'result'], function () {
                 Route::post('/{quizzes:slug}/quiz', [ResultController::class, 'quizStore']);
+                Route::post('/{quizzes:slug}/essay', [ResultController::class, 'essayStore']);
                 Route::get('/{quizzes:slug}/notsubmitted', [ResultController::class, 'resultNotSubmitted']);
                 Route::get('/{quizzes:slug}/quiz', [ResultController::class, 'quizResultSubmitted']);
                 Route::get('/{quizzes:slug}/essay', [ResultController::class, 'essayResultSubmitted']);

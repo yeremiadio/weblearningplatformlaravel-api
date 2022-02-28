@@ -84,9 +84,9 @@ class MaterialController extends Controller
      * @param  \App\Models\Material  $material
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($slug)
     {
-        $material = Material::where('id', $id)->get();
+        $material = Material::where('slug', $slug)->get();
         if ($material) {
             $this->responseFailed('Data not found');
         }

@@ -123,9 +123,7 @@ class ResultController extends Controller
             DB::beginTransaction();
 
             if ($request->hasFile('file')) {
-                $input['file'] = rand() . '.' . request()->file->getClientOriginalExtension();
-
-                request()->file->move(public_path('assets/files/quiz/'), $input['file']);
+                $input['file'] = cloudinary()->upload($request->file('file')->getRealPath())->getSecurePath();
             }
 
             $data = [
@@ -193,8 +191,7 @@ class ResultController extends Controller
         $quiz = Quiz::where('slug', $slug)->first();
         if (!$quiz) return $this->responseFailed('Data tidak ditemukan', '', 404);
 
-        $data = User::select('id', 'name', 'email', 'avatar', 'number')
-            ->where('role', 'siswa')
+        $data = User::select('id', 'name', 'email')
             ->whereHas('results', function ($q) use ($quiz) {
                 $q->where('quiz_id', $quiz->id);
             })
