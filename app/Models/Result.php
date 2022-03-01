@@ -25,4 +25,9 @@ class Result extends Model
     {
         return $this->hasMany(ResultQuiz::class);
     }
+
+    public function result_essays()
+    {
+        return $this->hasMany(ResultEssay::class);
+    }
 }

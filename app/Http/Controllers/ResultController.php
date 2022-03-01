@@ -227,12 +227,33 @@ class ResultController extends Controller
 
         return $this->responseSuccess('Score berhasil dibuat');
     }
+    public function showSingleResult($resultId)
+    {
+        $result = Result::where([
+            'id' => $resultId,
+            'user_id' => auth()->user()->id
+        ])->with([
+            'quiz:id,title,slug,type,thumbnail',
+            'result_quizzes' => function ($q) {
+                $q->select('id', 'result_id', 'question_id', 'option_id', 'correct');
+            },
+            'result_quizzes.question:id,question',
+            'result_quizzes.option:id,title',
+            'result_essays' => function ($q) {
+                $q->select('id', 'result_id', 'question_id', 'comment', 'file');
+            },
+            'result_essays.question:id,question',
+        ])->first();
 
-    public function studentResultSubmitted()
+        if (!$result) return $this->responseFailed('Data tidak ditemukan', '', 404);
+
+        return $this->responseSuccess('Result Fetched Successfully', $result);
+    }
+    public function showSubmittedResults()
     {
         $data = Result::where('user_id', auth()->user()->id)
             ->with([
-                'quiz:id,title,slug,type,banner',
+                'quiz:id,title,slug,type,thumbnail',
                 'result_quizzes' => function ($q) {
                     $q->select('id', 'result_id', 'question_id', 'option_id', 'correct');
                 },
