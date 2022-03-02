@@ -249,20 +249,21 @@ class ResultController extends Controller
 
         return $this->responseSuccess('Result Fetched Successfully', $result);
     }
-    public function showSubmittedResults()
+    public function submittedResults()
+    {
+        $data = Result::with([
+            'user:id,name,email',
+            'quiz:id,title,slug,type,thumbnail',
+        ])
+            ->get();
+
+        return $this->responseSuccess('Data', $data);
+    }
+    public function submittedResultsByUserId()
     {
         $data = Result::where('user_id', auth()->user()->id)
             ->with([
                 'quiz:id,title,slug,type,thumbnail',
-                'result_quizzes' => function ($q) {
-                    $q->select('id', 'result_id', 'question_id', 'option_id', 'correct');
-                },
-                'result_quizzes.question:id,question',
-                'result_quizzes.option:id,title',
-                'result_essays' => function ($q) {
-                    $q->select('id', 'result_id', 'question_id', 'comment', 'file');
-                },
-                'result_essays.question:id,question',
             ])
             ->get();
 

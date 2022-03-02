@@ -70,6 +70,7 @@ Route::middleware(['api' => 'return-json'])->group(function () {
         });
         //Email Verification
         Route::post('verify-email', [EmailVerificationController::class, 'sendVerificationEmail']);
+        //Route Middleware when user already verified by email
         Route::group(['middleware' => ['verified']], function () {
             //Quizzes
             Route::get('quizzes', [QuizController::class, 'index']);
@@ -83,14 +84,17 @@ Route::middleware(['api' => 'return-json'])->group(function () {
             Route::get('users', [UserController::class, 'index']);
             Route::get('users/{id}', [UserController::class, 'show']);
             Route::put('profile/{id}/update', [AuthenticationController::class, 'update']);
-            //Role Admin and Teacher
+            //Role Admin or Teacher
             Route::group(['middleware' => ['role:admin|teacher']], function () {
                 Route::group(['prefix' => 'users'], function () {
                     Route::post('/create', [UserController::class, 'store']);
                     Route::put('/{id}/update', [UserController::class, 'update']);
                     Route::delete('/{id}/delete', [UserController::class, 'destroy']);
                 });
+                //Result
                 Route::group(['prefix' => 'result'], function () {
+                    Route::get('/all/submitted', [ResultController::class, 'submittedResults']);
+                    Route::get('/user/submitted', [ResultController::class, 'submittedResultsByUserId']);
                     Route::get('/{quizzes:slug}/notsubmitted', [ResultController::class, 'resultNotSubmitted']);
                     Route::get('/{quizzes:slug}/quiz', [ResultController::class, 'quizResultSubmitted']);
                     Route::get('/{quizzes:slug}/essay', [ResultController::class, 'essayResultSubmitted']);
