@@ -28,11 +28,20 @@ class EmailVerificationController extends Controller
             event(new Verified($user));
             response()->json('Email has been verified', 200);
             if (Auth::check()) {
-                return redirect('http://localhost:3000/dashboard');
+                if (app()->environment('local')) {
+                    return redirect('http://localhost:3000/dashboard');
+                }
+                return redirect('https://inter-weblearningplatform.vercel.app/login');
             }
-            return redirect('http://localhost:3000/login');
+            if (app()->environment('local')) {
+                return redirect('http://localhost:3000/login');
+            }
+            return redirect('https://inter-weblearningplatform.vercel.app/login');
         }
         response()->json('Email has been verified', 200);
-        return redirect('http://localhost:3000/login');
+        if (app()->environment('local')) {
+            return redirect('http://localhost:3000/login');
+        }
+        return redirect('https://inter-weblearningplatform.vercel.app/login');
     }
 }
