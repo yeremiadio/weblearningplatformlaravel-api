@@ -48,10 +48,10 @@ class AuthenticationController extends Controller
             'avatar' => empty($request->file('avatar')) ? null : $uploadedFileUrl
         ]);
 
-        // $user->assignRole('student');
-        // if (!empty($input['role'])) {
-        //     $user->assignRole($input['role']);
-        // }
+        $user->assignRole('student');
+        if (!empty($input['role'])) {
+            $user->assignRole($input['role']);
+        }
         $token = $user->createToken('token')->plainTextToken;
         $data = [
             'user' => User::where('id', $user->id)->with('roles')->first(),
