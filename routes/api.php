@@ -48,6 +48,7 @@ Route::middleware(['api' => 'return-json'])->group(function () {
     Route::get('codes/single/{codes:slug}', [CodeController::class, 'show']);
     //Fetch Materials and Single Material
     Route::get('materials', [MaterialController::class, 'index']);
+    Route::get('materials/latest', [MaterialController::class, 'indexWithFilter']);
     Route::get('materials/single/{materials:slug}', [MaterialController::class, 'show']);
     //Get Hashcode email verification
     Route::get('verify-email/{id}/{hash}', [EmailVerificationController::class, 'verify'])->name('verification.verify');
@@ -106,7 +107,6 @@ Route::middleware(['api' => 'return-json'])->group(function () {
                     Route::delete('/{quizzes:slug}/delete', [QuizController::class, 'destroy']);
                 });
                 Route::group(['prefix' => 'materials'], function () {
-                    Route::get('/latest', [MaterialController::class, 'indexWithFilter']);
                     Route::post('/create', [MaterialController::class, 'store']);
                     Route::get('/screenshot', [MaterialController::class, 'storeScreenshotPage']);
                     Route::put('/{id}/update', [MaterialController::class, 'update']);
