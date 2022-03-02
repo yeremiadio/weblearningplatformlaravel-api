@@ -40,13 +40,5 @@ class UsersTableSeeder extends Seeder
             'updated_at' => Carbon::now(),
         ]);
         $user_two->assignRole('teacher');
-
-        //User Factory
-        foreach (Role::all() as $role) {
-            $users = User::factory()->count(30)->create();
-            foreach ($users as $user) {
-                $user->assignRole($role);
-            }
-        }
     }
 }
