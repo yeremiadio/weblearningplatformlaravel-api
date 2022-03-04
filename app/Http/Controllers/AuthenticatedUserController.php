@@ -67,7 +67,7 @@ class AuthenticatedUserController extends Controller
         ];
 
         //Result count by month
-        $data_results = Result::select('id', 'score')->get()->groupBy(function ($data) {
+        $data_results = Result::where('user_id', auth()->user()->id)->select('id', 'score')->get()->groupBy(function ($data) {
             return Carbon::parse($data->created_at)->format('M');
         });
 
@@ -75,7 +75,7 @@ class AuthenticatedUserController extends Controller
         $data_results_month_score = [];
         foreach ($data_results as $month => $values) {
             $data_results_months[] = $month;
-            foreach($values as $values2) {
+            foreach ($values as $values2) {
                 $data_results_month_score[] = $values2->score;
             };
         }
