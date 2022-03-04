@@ -6,6 +6,7 @@ use App\Models\Code;
 use App\Models\CodeHistories;
 use App\Models\Material;
 use App\Models\Quiz;
+use App\Models\Result;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -65,6 +66,25 @@ class AuthenticatedUserController extends Controller
             'month_count' => $data_materials_month_count
         ];
 
+        //Result count by month
+        $data_results = Result::select('id', 'score')->get()->groupBy(function ($data) {
+            return Carbon::parse($data->created_at)->format('M');
+        });
+
+        $data_results_months = [];
+        $data_results_month_score = [];
+        foreach ($data_results as $month => $values) {
+            $data_results_months[] = $month;
+            foreach($values as $values2) {
+                $data_results_month_score[] = $values2->score;
+            };
+        }
+
+        $data_results_months = [
+            'months' => $data_results_months,
+            'scores_month_count' => $data_results_month_score
+        ];
+
         $data = [
             'all_data_count' => $dataCount,
             'all_roles_count' => [
@@ -72,6 +92,7 @@ class AuthenticatedUserController extends Controller
                 'count' => $all_roles_count
             ],
             'data_materials_count_by_month' => $data_materials_count,
+            'data_scores_count_by_month' => $data_results_months
         ];
         return $this->responseSuccess('Data Fetched Successfully', $data, 200);
     }
