@@ -13,6 +13,13 @@ use Spatie\Permission\Models\Role;
 
 class AuthenticatedUserController extends Controller
 {
+    public function getAuthUser()
+    {
+        $user = User::where('id', auth()->user()->id)->first();
+        if (!$user) $this->responseFailed('User not found', '', 404);
+
+        return $this->responseSuccess('User Fetched Sucessfully', $user, 200);
+    }
     public function dashboard(Request $request)
     {
 

@@ -50,10 +50,14 @@ Route::middleware(['api' => 'return-json'])->group(function () {
     Route::get('materials', [MaterialController::class, 'index']);
     Route::get('materials/latest', [MaterialController::class, 'indexWithFilter']);
     Route::get('materials/single/{materials:slug}', [MaterialController::class, 'show']);
+    //Check Email Verification User
+    Route::get('check-verification/{users:id}', [EmailVerificationController::class, 'checkVerification']);
     //Get Hashcode email verification
     Route::get('verify-email/{id}/{hash}', [EmailVerificationController::class, 'verify'])->name('verification.verify');
     //Route Middleware Laravel Sanctum
     Route::group(['middleware' => ['auth:sanctum']], function () {
+
+        Route::get('me', [AuthenticatedUserController::class, 'getAuthUser']);
         //Dashboard
         Route::get('fetch-dashboard', [AuthenticatedUserController::class, 'dashboard']);
         //Auth Check

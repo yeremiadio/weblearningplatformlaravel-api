@@ -20,6 +20,16 @@ class EmailVerificationController extends Controller
         return response()->json('Email verification has been sent', 200);
     }
 
+    public function checkVerification($id)
+    {
+        $user = User::findOrFail($id);
+        if (!$user) $this->responseFailed('User not found', '', 404);
+
+        if ($user->hasVerifiedEmail()) {
+            return response()->json('Email already verified', 400);
+        }
+    }
+
     public function verify($id)
     {
         $user = User::findOrFail($id);

@@ -53,8 +53,8 @@ class QuizController extends Controller
         $validator = Validator::make($input, [
             'type' => 'required|string',
             'title' => 'required|string',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date',
+            'start_date' => 'required|date|before:end_date',
+            'end_date' => 'required|date|after:start_date',
             'thumbnail' => 'nullable|mimes:jpeg,png,jpg',
             'questions' => 'required|array|between:1,10',
             'questions.*.question' => 'required|string',
