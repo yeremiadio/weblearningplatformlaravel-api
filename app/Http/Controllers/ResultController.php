@@ -227,10 +227,10 @@ class ResultController extends Controller
 
         return $this->responseSuccess('Score berhasil dibuat');
     }
-    public function showSingleResult($resultId, $userId)
+    public function showSingleResult($quizId, $userId)
     {
         $result = Result::where([
-            'id' => $resultId,
+            'quiz_id' => $quizId,
             'user_id' => $userId,
         ])->with([
             'quiz:id,title,slug,type,thumbnail',
