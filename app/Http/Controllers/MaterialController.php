@@ -86,10 +86,8 @@ class MaterialController extends Controller
      */
     public function show($slug)
     {
-        $material = Material::where('slug', $slug)->get();
-        if ($material) {
-            $this->responseFailed('Data not found');
-        }
+        $material = Material::where('slug', $slug)->first();
+        if (!$material) return $this->responseFailed('Data not found', '', 404);
 
         return $this->responseSuccess('Data fetched Successfully', $material);
     }

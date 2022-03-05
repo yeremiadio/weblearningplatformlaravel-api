@@ -108,7 +108,7 @@ Route::middleware(['api' => 'return-json'])->group(function () {
                 Route::group(['prefix' => 'quizzes'], function () {
                     Route::post('/create', [QuizController::class, 'store']);
                     Route::put('/{quizzes:slug}/update', [QuizController::class, 'update']);
-                    Route::delete('/{quizzes:slug}/delete', [QuizController::class, 'destroy']);
+                    Route::delete('/{quizzes:id}/delete', [QuizController::class, 'destroy']);
                 });
                 Route::group(['prefix' => 'materials'], function () {
                     Route::post('/create', [MaterialController::class, 'store']);

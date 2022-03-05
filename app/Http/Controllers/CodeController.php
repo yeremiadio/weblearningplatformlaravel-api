@@ -77,14 +77,12 @@ class CodeController extends Controller
      */
     public function show($slug)
     {
-        try {
-            $data = Code::where([
-                'slug' => $slug,
-            ])->first();
-            return $this->responseSuccess('Fetched Code Successfully', $data, 200);
-        } catch (\ErrorException $e) {
-            return $this->responseFailed('Response error', $e, 500);
-        }
+        $data = Code::where([
+            'slug' => $slug,
+        ])->first();
+
+        if (!$data) return $this->responseFailed('Data not found', '', 404);
+        return $this->responseSuccess('Fetched Code Successfully', $data, 200);
     }
 
     public function storeWebPageBuilder(Request $request, $slug)

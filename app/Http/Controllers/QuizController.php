@@ -57,12 +57,12 @@ class QuizController extends Controller
             'start_date' => 'required|date|before:end_date',
             'end_date' => 'required|date|after:start_date',
             'thumbnail' => 'nullable|mimes:jpeg,png,jpg',
-            'questions' => 'present|array|between:1,10',
+            'questions' => 'array|between:1,10',
             'questions.*.question' => 'required|string',
             'questions.*.file' => 'nullable|mimes:jpeg,png,jpg,doc,docx,pdf',
             'questions.*.options' => 'sometimes|array|between:1,5',
             // 'questions.*.options.*.title' => 'required|string',
-            'questions.*.options.*.correct' => 'required|boolean',
+            'questions.*.options.*.correct' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -324,9 +324,9 @@ class QuizController extends Controller
         }
     }
 
-    public function destroy($slug)
+    public function destroy($id)
     {
-        $quiz = Quiz::where('slug', $slug)->with('questions')->first();
+        $quiz = Quiz::where('id', $id)->with('questions')->first();
         if (!$quiz) return $this->responseFailed('Data not found', '', 404);
 
         // if ($quiz->banner) {
