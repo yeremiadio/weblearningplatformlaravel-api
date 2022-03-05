@@ -84,6 +84,7 @@ Route::middleware(['api' => 'return-json'])->group(function () {
                 Route::post('/{quizzes:slug}/quiz', [ResultController::class, 'quizStore']);
                 Route::post('/{quizzes:slug}/essay', [ResultController::class, 'essayStore']);
                 Route::get('/single/{results:id}', [ResultController::class, 'showSingleResult']);
+                Route::get('/user/submitted', [ResultController::class, 'submittedResultsByUserId']);
             });
             //Users
             Route::get('users', [UserController::class, 'index']);
@@ -99,7 +100,6 @@ Route::middleware(['api' => 'return-json'])->group(function () {
                 //Result
                 Route::group(['prefix' => 'result'], function () {
                     Route::get('/all/submitted', [ResultController::class, 'submittedResults']);
-                    Route::get('/user/submitted', [ResultController::class, 'submittedResultsByUserId']);
                     Route::get('/{quizzes:slug}/notsubmitted', [ResultController::class, 'resultNotSubmitted']);
                     Route::get('/{quizzes:slug}/quiz', [ResultController::class, 'quizResultSubmitted']);
                     Route::get('/{quizzes:slug}/essay', [ResultController::class, 'essayResultSubmitted']);

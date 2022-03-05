@@ -16,7 +16,7 @@ class AuthenticatedUserController extends Controller
 {
     public function getAuthUser()
     {
-        $user = User::where('id', auth()->user()->id)->first();
+        $user = User::where('id', auth()->user()->id)->with('roles')->first();
         if (!$user) $this->responseFailed('User not found', '', 404);
 
         return $this->responseSuccess('User Fetched Sucessfully', $user, 200);
@@ -67,20 +67,18 @@ class AuthenticatedUserController extends Controller
         ];
 
         //Result count by month
-        $data_results = Result::where('user_id', auth()->user()->id)->select('id', 'score')->get()->groupBy(function ($data) {
-            return Carbon::parse($data->created_at)->format('M');
-        });
-
+        $data_results = Result::where('user_id', auth()->user()->id)->select('id', 'score', 'created_at')->get();
         $data_results_months = [];
         $data_results_month_score = [];
-        foreach ($data_results as $month => $values) {
-            $data_results_months[] = $month;
-            foreach ($values as $values2) {
-                $data_results_month_score[] = $values2->score;
-            };
+        // foreach ($data_results as $month => $values) {
+        //     $data_results_months[] = $month;
+        // }
+        foreach ($data_results as $key => $values2) {
+            $data_results_month_score[] = $values2->score;
         }
 
         $data_results_months = [
+            'data' => $data_results,
             'months' => $data_results_months,
             'scores_month_count' => $data_results_month_score
         ];

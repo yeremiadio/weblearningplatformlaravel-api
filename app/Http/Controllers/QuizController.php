@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class QuizController extends Controller
 {
@@ -56,11 +57,12 @@ class QuizController extends Controller
             'start_date' => 'required|date|before:end_date',
             'end_date' => 'required|date|after:start_date',
             'thumbnail' => 'nullable|mimes:jpeg,png,jpg',
-            'questions' => 'required|array|between:1,10',
+            'questions' => 'present|array|between:1,10',
             'questions.*.question' => 'required|string',
             'questions.*.file' => 'nullable|mimes:jpeg,png,jpg,doc,docx,pdf',
             'questions.*.options' => 'sometimes|array|between:1,5',
-            'questions.*.options.*.correct' => 'required',
+            // 'questions.*.options.*.title' => 'required|string',
+            'questions.*.options.*.correct' => 'required|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -99,7 +101,7 @@ class QuizController extends Controller
                     'file' => $questionValue['file']
                 ]);
 
-                if ($quiz->type === 'quiz') {
+                if ($quiz->type == 'quiz') {
                     foreach ($questionValue['options'] as $optionValue) {
                         Option::create([
                             'question_id' => $question->id,
