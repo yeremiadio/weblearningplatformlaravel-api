@@ -75,7 +75,7 @@ class ResultController extends Controller
                         ];
                         $res = ResultQuiz::create($optData);
                         if ($res->correct) {
-                            $score += 100 / count($item->questions);
+                            $score += 10;
                             $correct_answers += 1;
                         }
                         break;
