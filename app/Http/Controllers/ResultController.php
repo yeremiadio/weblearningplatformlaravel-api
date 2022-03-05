@@ -54,6 +54,8 @@ class ResultController extends Controller
             $score = 0;
             $correct_answers = 0;
 
+            $defaultScore = 100 / count($input[0]->questions);
+
             foreach ($input as $item) {
                 foreach ($item->options as $option) {
                     if (!property_exists($option, 'selected')) {
@@ -88,7 +90,8 @@ class ResultController extends Controller
 
             $data_result = [
                 'score' => $score,
-                'correct_answers' => $correct_answers
+                'correct_answers' => $correct_answers,
+                'default_score' => $defaultScore
             ];
 
             return $this->responseSuccess('Result has been stored', $data_result, 201);
