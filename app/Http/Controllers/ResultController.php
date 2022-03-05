@@ -75,7 +75,7 @@ class ResultController extends Controller
                         ];
                         $res = ResultQuiz::create($optData);
                         if ($res->correct) {
-                            $score += 10;
+                            $score += 100 / count($input->questions);
                             $correct_answers += 1;
                         }
                         break;
@@ -227,11 +227,11 @@ class ResultController extends Controller
 
         return $this->responseSuccess('Score berhasil dibuat');
     }
-    public function showSingleResult($resultId)
+    public function showSingleResult($resultId, $userId)
     {
         $result = Result::where([
             'id' => $resultId,
-            'user_id' => auth()->user()->id
+            'user_id' => $userId,
         ])->with([
             'quiz:id,title,slug,type,thumbnail',
             'result_quizzes' => function ($q) {
