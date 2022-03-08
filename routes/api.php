@@ -6,10 +6,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthenticationController;
 use App\Http\Controllers\CodeController;
 use App\Http\Controllers\ResultController;
-use App\Http\Controllers\CodeHistoryController;
 use App\Http\Controllers\EmailVerificationController;
 use App\Http\Controllers\ImageUploadController;
 use App\Http\Controllers\MaterialController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
@@ -73,6 +73,11 @@ Route::middleware(['api' => 'return-json'])->group(function () {
             Route::put('{slug}/update', [CodeController::class, 'update']);
             Route::delete('{id}/delete', [CodeController::class, 'destroy']);
         });
+        //Notification
+        Route::group(['prefix' => 'notifications'], function () {
+            Route::get('/', [NotificationController::class, 'index']);
+            Route::delete('/delete', [NotificationController::class, 'deleteAllNotification']);
+        });
         //Email Verification
         Route::post('verify-email', [EmailVerificationController::class, 'sendVerificationEmail']);
         //Route Middleware when user already verified by email
@@ -86,17 +91,9 @@ Route::middleware(['api' => 'return-json'])->group(function () {
                 Route::get('/single/{quizId}/{userId}', [ResultController::class, 'showSingleResult']);
                 Route::get('/user/submitted', [ResultController::class, 'submittedResultsByUserId']);
             });
-            //Users
-            Route::get('users', [UserController::class, 'index']);
-            Route::get('users/{id}', [UserController::class, 'show']);
             Route::put('profile/{id}/update', [AuthenticationController::class, 'update']);
             //Role Admin or Teacher
             Route::group(['middleware' => ['role:admin|teacher']], function () {
-                Route::group(['prefix' => 'users'], function () {
-                    Route::post('/create', [UserController::class, 'store']);
-                    Route::put('/{id}/update', [UserController::class, 'update']);
-                    Route::delete('/{id}/delete', [UserController::class, 'destroy']);
-                });
                 //Result
                 Route::group(['prefix' => 'result'], function () {
                     Route::get('/all/submitted', [ResultController::class, 'submittedResults']);
@@ -119,9 +116,12 @@ Route::middleware(['api' => 'return-json'])->group(function () {
             });
             //Role Admin
             Route::group(['middleware' => ['role:admin']], function () {
-                Route::group(['prefix' => 'pages'], function () {
-                    Route::post('/create', [PageController::class, 'store']);
-                    Route::delete('/{slug}/delete', [PageController::class, 'destroy']);
+                Route::group(['prefix' => 'users'], function () {
+                    Route::get('/', [UserController::class, 'index']);
+                    Route::get('/{id}', [UserController::class, 'show']);
+                    Route::post('/create', [UserController::class, 'store']);
+                    Route::put('/{id}/update', [UserController::class, 'update']);
+                    Route::delete('/{id}/delete', [UserController::class, 'destroy']);
                 });
                 Route::group(['prefix' => 'roles'], function () {
                     Route::post('/create', [RoleController::class, 'store']);

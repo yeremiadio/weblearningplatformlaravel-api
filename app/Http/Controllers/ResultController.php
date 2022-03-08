@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Notification;
 use App\Models\Quiz;
 use App\Models\Result;
 use App\Models\ResultQuiz;
@@ -83,7 +84,9 @@ class ResultController extends Controller
                 }
             }
             $result->update(['score' => $score]);
-
+            Notification::create([
+                'text' => 'Selamat! Kamu telah mengerjakan tugas' . ' ' . $quiz->title . '.' . ' Tipe tugas ini kuis. Skor kamu sebesar' . ' ' . $score . '.' . ' Tetap semangat, ya!',
+            ]);
             DB::commit();
 
             $data_result = [
@@ -222,6 +225,10 @@ class ResultController extends Controller
         if ($validator->fails()) {
             return $this->responseFailed('Validasi error', $validator->errors(), 400);
         }
+
+        Notification::create([
+            'text' => 'Guru telah memasukkan nilai. Silahkan periksa nilai kamu di halaman tugas. Jika nilai belum masuk, hubungi guru anda. Semangat!',
+        ]);
 
         $result->update(['score' => $input['score']]);
 

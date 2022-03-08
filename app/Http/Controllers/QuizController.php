@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Notification;
 use App\Models\Option;
 use App\Models\Question;
 use App\Models\Quiz;
@@ -111,6 +112,10 @@ class QuizController extends Controller
                     }
                 }
             }
+
+            Notification::create([
+                'text' => 'Ada tugas baru nih! Nama tugasnya' . ' ' . $quiz->title . '.' . ' Yuk segera dikerjakan sebelum tanggal' . ' ' . $quiz->end_date . '.' . ' Semoga hasilnya memuaskan.',
+            ]);
 
             DB::commit();
 

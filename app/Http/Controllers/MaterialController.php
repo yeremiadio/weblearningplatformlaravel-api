@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Material;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -73,6 +74,10 @@ class MaterialController extends Controller
             'content' => $input['content'],
             'slug' => Str::slug($input['title']),
             'thumbnail' => $uploadedFileUrl ?? null
+        ]);
+
+        Notification::create([
+            'text' => 'Materi baru telah dibuat dengan nama' . ' ' . $data->title . ' Yuk dibaca materinya. Semangat!',
         ]);
 
         return $this->responseSuccess('Data created', $data, 201);
