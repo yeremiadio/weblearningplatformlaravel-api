@@ -241,8 +241,8 @@ class QuizController extends Controller
 
             $quiz->update([
                 'title' => $input['title'],
-                'start_date' => $input['end_date'],
-                'end_date' => $input['start_date'],
+                'start_date' => $input['start_date'],
+                'end_date' => $input['end_date'],
                 'thumbnail' => $input['thumbnail']
             ]);
 

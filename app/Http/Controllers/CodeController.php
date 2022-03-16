@@ -53,12 +53,21 @@ class CodeController extends Controller
             return $this->responseFailed('Validator error', $validator->errors(), 400);
         }
         $titleCode = $input['title'];
+        $screenshotImage = $input['screenshot'];
+
+        if ($screenshotImage) {
+            $screenshotImage = str_replace('data:image/png;base64,', '', $screenshotImage);
+            $screenshotImage = str_replace(' ', '+', $screenshotImage);
+            // $bin = base64_decode($screenshotImage);
+            $uploadedFileUrl = $this->uploadFileImageKit($screenshotImage);
+        }
         try {
             $code = Code::create([
                 'title' => $titleCode,
                 'slug' => Str::slug($titleCode) . '-' . uniqid(),
                 'code' => $input['code'],
                 'type' => $input['type'],
+                'screenshot' => $uploadedFileUrl,
                 'description' => $input['description'] ?? null,
                 'user_id' => auth()->id()
             ]);
@@ -139,12 +148,21 @@ class CodeController extends Controller
             return $this->responseFailed('Validator error', $validator->errors(), 400);
         }
         $titleCode = $input['title'];
+        $screenshotImage = $input['screenshot'];
+
+        if ($screenshotImage) {
+            $screenshotImage = str_replace('data:image/png;base64,', '', $screenshotImage);
+            $screenshotImage = str_replace(' ', '+', $screenshotImage);
+            // $bin = base64_decode($screenshotImage);
+            $uploadedFileUrl = $this->uploadFileImageKit($screenshotImage);
+        }
         try {
             $code->update([
                 'title' => $titleCode,
                 'slug' => Str::slug($titleCode) . '-' . uniqid(),
                 'code' => $input['code'],
                 'type' => $input['type'],
+                'screenshot' => $uploadedFileUrl,
                 'description' => $input['description'] ?? null,
                 'user_id' => auth()->id()
             ]);

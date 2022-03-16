@@ -65,6 +65,20 @@ class Controller extends BaseController
 
             $url = $response->success->url;
             return $url;
+        } else {
+            $client = new ImageKit(
+                env('IMAGEKIT_PUBLIC_KEY'),
+                env('IMAGEKIT_PRIVATE_KEY'),
+                env('IMAGEKIT_CLIENTID')
+            );
+
+            $response = $client->upload(array(
+                'file' => $name,
+                'fileName' => "my_file_name.jpg",
+            ));
+
+            $url = $response->success->url;
+            return $url;
         }
     }
 }

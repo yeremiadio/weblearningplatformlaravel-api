@@ -21,6 +21,7 @@ class AuthenticatedUserController extends Controller
 
         return $this->responseSuccess('User Fetched Sucessfully', $user, 200);
     }
+
     public function dashboard(Request $request)
     {
 
