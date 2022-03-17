@@ -16,7 +16,7 @@ class CodeController extends Controller
      */
     public function index()
     {
-        $data = Code::all();
+        $data = Code::with('user')->orderBy('updated_at', 'DESC')->get();
         return $this->responseSuccess('Codes Data', $data, 200);
     }
 
@@ -147,6 +147,8 @@ class CodeController extends Controller
         if ($validator->fails()) {
             return $this->responseFailed('Validator error', $validator->errors(), 400);
         }
+
+        $oldScreenshot = $code->screenshot;
         $titleCode = $input['title'];
         $screenshotImage = $input['screenshot'];
 
@@ -155,6 +157,8 @@ class CodeController extends Controller
             $screenshotImage = str_replace(' ', '+', $screenshotImage);
             // $bin = base64_decode($screenshotImage);
             $uploadedFileUrl = $this->uploadFileImageKit($screenshotImage);
+        } else {
+            $uploadedFileUrl = $oldScreenshot;
         }
         try {
             $code->update([
