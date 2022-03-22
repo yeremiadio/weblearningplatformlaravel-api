@@ -147,26 +147,26 @@ class CodeController extends Controller
         if ($validator->fails()) {
             return $this->responseFailed('Validator error', $validator->errors(), 400);
         }
-
-        $oldScreenshot = $code->screenshot;
         $titleCode = $input['title'];
-        $screenshotImage = $input['screenshot'];
 
-        if ($screenshotImage) {
-            $screenshotImage = str_replace('data:image/png;base64,', '', $screenshotImage);
-            $screenshotImage = str_replace(' ', '+', $screenshotImage);
-            // $bin = base64_decode($screenshotImage);
-            $uploadedFileUrl = $this->uploadFileImageKit($screenshotImage);
-        } else {
-            $uploadedFileUrl = $oldScreenshot;
-        }
+        // $oldScreenshot = $code->screenshot;
+        // $screenshotImage = $input['screenshot'];
+
+        // if ($screenshotImage) {
+        //     $screenshotImage = str_replace('data:image/png;base64,', '', $screenshotImage);
+        //     $screenshotImage = str_replace(' ', '+', $screenshotImage);
+        //     // $bin = base64_decode($screenshotImage);
+        //     $uploadedFileUrl = $this->uploadFileImageKit($screenshotImage);
+        // } else {
+        //     $uploadedFileUrl = $oldScreenshot;
+        // }
         try {
             $code->update([
                 'title' => $titleCode,
                 'slug' => Str::slug($titleCode) . '-' . uniqid(),
                 'code' => $input['code'],
                 'type' => $input['type'],
-                'screenshot' => $uploadedFileUrl,
+                // 'screenshot' => $uploadedFileUrl,
                 'description' => $input['description'] ?? null,
                 'user_id' => auth()->id()
             ]);
