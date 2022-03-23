@@ -58,7 +58,6 @@ class CodeController extends Controller
         if ($screenshotImage) {
             $screenshotImage = str_replace('data:image/png;base64,', '', $screenshotImage);
             $screenshotImage = str_replace(' ', '+', $screenshotImage);
-            // $bin = base64_decode($screenshotImage);
             $uploadedFileUrl = $this->uploadFileImageKit($screenshotImage);
         }
         try {
