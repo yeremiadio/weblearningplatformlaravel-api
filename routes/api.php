@@ -34,6 +34,7 @@ Route::middleware(['api' => 'return-json'])->group(function () {
     Route::post('/login', [AuthenticationController::class, 'login']);
     //Post Upload any file types to ImageKit
     Route::post('upload', [ImageUploadController::class, 'upload']);
+    Route::post('upload-cloudinary', [ImageUploadController::class, 'uploadCloudinary']);
     //Post Code to Glot
     Route::post('code-glot', function (Request $request) {
         $input = $request->all();

@@ -15,4 +15,15 @@ class ImageUploadController extends Controller
             return $this->responseFailed($e, 500);
         }
     }
+
+    public function uploadCloudinary(Request $request)
+    {
+        try {
+            $data = cloudinary()->upload($request->file('image')->getRealPath())->getSecurePath();
+            return response()->json($data, 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->responseFailed('Failed upload data');
+        }
+    }
 }
