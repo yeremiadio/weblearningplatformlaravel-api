@@ -128,7 +128,7 @@ class MaterialController extends Controller
             'title' => 'required|string',
             'description' => 'required|string',
             'content' => 'required|string',
-            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+            'thumbnail' => 'nullable'
         ]);
 
         if ($validator->fails()) {
