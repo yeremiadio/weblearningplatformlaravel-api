@@ -30,7 +30,7 @@ class AuthenticatedUserController extends Controller
         $role_count = count(Role::all());
         $material_count = count(Material::all());
         $quiz_count = count(Quiz::all());
-        $code_histories_count = count(Code::all());
+        $code_histories_count = count(Code::where('user_id', auth()->user()->id)->get());
 
         $dataCount = [
             'user' => +$user_count,

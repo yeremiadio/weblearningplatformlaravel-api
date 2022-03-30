@@ -148,17 +148,6 @@ class CodeController extends Controller
         }
         $titleCode = $input['title'];
 
-        // $oldScreenshot = $code->screenshot;
-        // $screenshotImage = $input['screenshot'];
-
-        // if ($screenshotImage) {
-        //     $screenshotImage = str_replace('data:image/png;base64,', '', $screenshotImage);
-        //     $screenshotImage = str_replace(' ', '+', $screenshotImage);
-        //     // $bin = base64_decode($screenshotImage);
-        //     $uploadedFileUrl = $this->uploadFileImageKit($screenshotImage);
-        // } else {
-        //     $uploadedFileUrl = $oldScreenshot;
-        // }
         try {
             $code->update([
                 'title' => $titleCode,
