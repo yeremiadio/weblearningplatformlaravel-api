@@ -209,7 +209,6 @@ class QuizController extends Controller
             'title' => 'required|string',
             'start_date' => 'required|date',
             'end_date' => 'required|date',
-            'thumbnail' => 'nullable|mimes:jpeg,png,jpg',
             'questions' => 'required|array|between:1,10',
             'questions.*.id' => 'required|numeric',
             'questions.*.question' => 'required|string',
